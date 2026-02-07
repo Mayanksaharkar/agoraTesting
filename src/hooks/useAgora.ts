@@ -10,7 +10,7 @@ import AgoraRTC, {
 export interface VideoConfig {
   appId: string;
   channelName: string;
-  token: string;
+  token?: string | null;  // Optional or null
   uid: number;
   role: 'host' | 'audience';
 }
@@ -60,7 +60,9 @@ export function useAgora() {
   const joinAsHost = useCallback(async (videoConfig: VideoConfig, localVideoEl: string) => {
     const client = initClient();
     await client.setClientRole('host');
-    await client.join(videoConfig.appId, videoConfig.channelName, videoConfig.token, videoConfig.uid);
+    // Use null if token is undefined/falsy
+    const token = videoConfig.token || null;
+    await client.join(videoConfig.appId, videoConfig.channelName, token, videoConfig.uid);
 
     const [audioTrack, videoTrack] = await AgoraRTC.createMicrophoneAndCameraTracks();
     audioTrackRef.current = audioTrack;
@@ -77,7 +79,9 @@ export function useAgora() {
   const joinAsViewer = useCallback(async (videoConfig: VideoConfig) => {
     const client = initClient();
     await client.setClientRole('audience');
-    await client.join(videoConfig.appId, videoConfig.channelName, videoConfig.token, videoConfig.uid || 0);
+    // Use null if token is undefined/falsy
+    const token = videoConfig.token || null;
+    await client.join(videoConfig.appId, videoConfig.channelName, token, videoConfig.uid || 0);
     setIsJoined(true);
   }, [initClient]);
 

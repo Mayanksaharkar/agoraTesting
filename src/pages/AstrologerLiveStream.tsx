@@ -54,29 +54,48 @@ export default function AstrologerLiveStream() {
     const socket = getSocket();
     if (!socket) return;
 
+    const normalizeMessage = (payload: any): ChatMessage | null => {
+      const msg = payload?.message || payload;
+      if (!msg) return null;
+      return {
+        _id: msg._id || msg.id || `${msg.userId}-${msg.timestamp || Date.now()}`,
+        userId: msg.userId,
+        userName: msg.userName || 'Anonymous',
+        userPhoto: msg.userPhoto,
+        message: msg.message,
+        timestamp: msg.timestamp || new Date().toISOString(),
+        isDeleted: msg.isDeleted,
+      };
+    };
+
     const onViewerJoined = (data: any) => {
-      setStats((s) => ({ ...s, currentViewers: data.currentViewerCount }));
-      toast({ title: `${data.userName} joined!`, duration: 2000 });
+      const count = data.currentViewers ?? data.currentViewerCount ?? 0;
+      setStats((s) => ({ ...s, currentViewers: count }));
+      const name = data.viewerName || data.userName || 'Viewer';
+      toast({ title: `${name} joined!`, duration: 2000 });
     };
 
     const onViewerLeft = (data: any) => {
-      setStats((s) => ({ ...s, currentViewers: data.currentViewerCount }));
+      const count = data.currentViewers ?? data.currentViewerCount ?? 0;
+      setStats((s) => ({ ...s, currentViewers: count }));
     };
 
-    const onMessage = (data: ChatMessage) => {
-      setMessages((prev) => [...prev, data]);
+    const onMessage = (data: any) => {
+      const msg = normalizeMessage(data);
+      if (!msg) return;
+      setMessages((prev) => [...prev, msg]);
       setStats((s) => ({ ...s, totalMessages: s.totalMessages + 1 }));
     };
 
     const onLike = (data: any) => {
-      setStats((s) => ({ ...s, totalLikes: data.totalLikes }));
+      setStats((s) => ({ ...s, totalLikes: data.totalLikes ?? s.totalLikes }));
     };
 
     const onStatsUpdate = (data: any) => {
       setStats((s) => ({ ...s, ...data }));
     };
 
-    const onLiveStarted = (data: any) => {
+    const onLiveStarted = () => {
       setIsLive(true);
       setIsStarting(false);
       toast({ title: 'You are LIVE!', description: 'Viewers can now join your stream' });
@@ -90,7 +109,9 @@ export default function AstrologerLiveStream() {
     socket.on('viewer_joined', onViewerJoined);
     socket.on('viewer_left', onViewerLeft);
     socket.on('live_message', onMessage);
+    socket.on('live_chat_message', onMessage);
     socket.on('live_like', onLike);
+    socket.on('live_liked', onLike);
     socket.on('stats_update', onStatsUpdate);
     socket.on('live_started', onLiveStarted);
     socket.on('live_ended', onLiveEnded);
@@ -99,7 +120,9 @@ export default function AstrologerLiveStream() {
       socket.off('viewer_joined', onViewerJoined);
       socket.off('viewer_left', onViewerLeft);
       socket.off('live_message', onMessage);
+      socket.off('live_chat_message', onMessage);
       socket.off('live_like', onLike);
+      socket.off('live_liked', onLike);
       socket.off('stats_update', onStatsUpdate);
       socket.off('live_started', onLiveStarted);
       socket.off('live_ended', onLiveEnded);
@@ -113,15 +136,24 @@ export default function AstrologerLiveStream() {
     try {
       // Fetch session details for video config
       const data = await astrologerApi.getSession(sessionId);
+      console.log('Session data:', data);
+      
       const videoConfig: VideoConfig = data.videoConfig || data.session?.agora;
+      console.log('Video config:', videoConfig);
 
       if (videoConfig) {
+        if (!videoConfig.appId) {
+          throw new Error('Agora App ID is missing. Check backend configuration.');
+        }
         await joinAsHost(videoConfig, 'local-video');
+      } else {
+        throw new Error('Video configuration not available from backend');
       }
 
       const socket = getSocket();
       socket?.emit('start_live', { sessionId });
     } catch (err: any) {
+      console.error('Failed to start live:', err);
       toast({ title: 'Failed to start', description: err.message, variant: 'destructive' });
       setIsStarting(false);
     }

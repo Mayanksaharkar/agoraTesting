@@ -26,13 +26,13 @@ async function request<T>(
 // Auth
 export const authApi = {
   loginAstrologer: (email: string, password: string) =>
-    request<any>('/api/v1/astrologer/auth/login', {
+    request<any>('/api/v1/astrologer/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
 
   loginUser: (email: string, password: string) =>
-    request<any>('/api/v1/user/auth/login', {
+    request<any>('/api/v1/user/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),

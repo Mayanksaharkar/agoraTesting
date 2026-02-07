@@ -56,6 +56,8 @@ export default function UserLiveViewing() {
     const init = async () => {
       try {
         const data = await userApi.getSession(sessionId);
+        console.log('User session data:', data);
+        
         setSession(data.session);
         setMessages(data.session?.messages || []);
         setLikes(data.session?.stats?.totalLikes || 0);
@@ -67,11 +69,18 @@ export default function UserLiveViewing() {
 
         // Join Agora as viewer
         if (data.videoConfig) {
+          console.log('Viewer video config:', data.videoConfig);
+          if (!data.videoConfig.appId) {
+            throw new Error('Agora App ID is missing from backend');
+          }
           await joinAsViewer(data.videoConfig as VideoConfig);
+        } else {
+          console.warn('No video config available, continuing without video');
         }
 
         setIsConnecting(false);
       } catch (err: any) {
+        console.error('Failed to join session:', err);
         toast({ title: 'Failed to join', description: err.message, variant: 'destructive' });
         setIsConnecting(false);
       }
@@ -93,16 +102,38 @@ export default function UserLiveViewing() {
     const socket = getSocket();
     if (!socket) return;
 
-    const onMessage = (data: ChatMessage) => {
-      setMessages((prev) => [...prev, data]);
+    const normalizeMessage = (payload: any): ChatMessage | null => {
+      const msg = payload?.message || payload;
+      if (!msg) return null;
+      return {
+        _id: msg._id || msg.id || `${msg.userId}-${msg.timestamp || Date.now()}`,
+        userId: msg.userId,
+        userName: msg.userName || 'Anonymous',
+        userPhoto: msg.userPhoto,
+        message: msg.message,
+        timestamp: msg.timestamp || new Date().toISOString(),
+        isDeleted: msg.isDeleted,
+      };
+    };
+
+    const onMessage = (data: any) => {
+      const msg = normalizeMessage(data);
+      if (!msg) return;
+      setMessages((prev) => [...prev, msg]);
     };
 
     const onLike = (data: any) => {
-      setLikes(data.totalLikes);
+      setLikes((prev) => data.totalLikes ?? prev);
     };
 
-    const onViewerCount = (data: any) => {
-      setCurrentViewers(data.currentViewers);
+    const onViewerJoined = (data: any) => {
+      const count = data.currentViewers ?? data.currentViewerCount ?? 0;
+      setCurrentViewers(count);
+    };
+
+    const onViewerLeft = (data: any) => {
+      const count = data.currentViewers ?? data.currentViewerCount ?? 0;
+      setCurrentViewers(count);
     };
 
     const onEnded = (data: any) => {
@@ -116,15 +147,21 @@ export default function UserLiveViewing() {
     };
 
     socket.on('live_message', onMessage);
+    socket.on('live_chat_message', onMessage);
     socket.on('live_like', onLike);
-    socket.on('viewer_count_update', onViewerCount);
+    socket.on('live_liked', onLike);
+    socket.on('viewer_joined', onViewerJoined);
+    socket.on('viewer_left', onViewerLeft);
     socket.on('live_ended', onEnded);
     socket.on('message_deleted', onMessageDeleted);
 
     return () => {
       socket.off('live_message', onMessage);
+      socket.off('live_chat_message', onMessage);
       socket.off('live_like', onLike);
-      socket.off('viewer_count_update', onViewerCount);
+      socket.off('live_liked', onLike);
+      socket.off('viewer_joined', onViewerJoined);
+      socket.off('viewer_left', onViewerLeft);
       socket.off('live_ended', onEnded);
       socket.off('message_deleted', onMessageDeleted);
     };
