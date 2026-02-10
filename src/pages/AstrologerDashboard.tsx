@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3, LogOut } from 'lucide-react';
+import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3, LogOut, Phone, Package } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { astrologerApi } from '@/services/api';
@@ -9,6 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import CreateSessionModal from '@/components/CreateSessionModal';
 import StatsWidget from '@/components/StatsWidget';
+import IncomingCallNotification from '@/components/IncomingCallNotification';
+import AvailabilityToggle from '@/components/AvailabilityToggle';
+import { useIncomingCalls } from '@/hooks/useIncomingCalls';
+import { useAvailability } from '@/hooks/useAvailability';
+import ChatNavLink from '@/components/ChatNavLink';
 
 interface Session {
   _id: string;
@@ -36,6 +41,12 @@ export default function AstrologerDashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [overallStats, setOverallStats] = useState<any>(null);
+  
+  // Incoming call management
+  const { incomingCall, isProcessing, acceptCall, rejectCall } = useIncomingCalls();
+  
+  // Availability management
+  const { status: availabilityStatus, updateStatus: updateAvailabilityStatus } = useAvailability();
 
   useEffect(() => {
     fetchSessions(activeTab);
@@ -83,6 +94,28 @@ export default function AstrologerDashboard() {
     toast({ title: 'Session scheduled!' });
   };
 
+  const handleAcceptCall = async () => {
+    try {
+      const callData = await acceptCall();
+      // Navigate to call page with call data
+      if (callData) {
+        // Store Agora credentials in localStorage for InCallUI to use
+        if (callData.data?.agora) {
+          console.log('[AstrologerDashboard] Storing Agora credentials:', callData.data.agora);
+          localStorage.setItem(`agora_${incomingCall?.callId}`, JSON.stringify(callData.data.agora));
+        }
+        
+        navigate(`/astrologer/call/${incomingCall?.callId}`);
+      }
+    } catch (error) {
+      // Error already handled in hook
+    }
+  };
+
+  const handleRejectCall = async () => {
+    await rejectCall();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -97,7 +130,40 @@ export default function AstrologerDashboard() {
               <p className="text-xs text-muted-foreground">{user?.name || 'Astrologer'}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+            {/* Availability Toggle */}
+            <AvailabilityToggle
+              initialStatus={availabilityStatus}
+              onStatusChange={updateAvailabilityStatus}
+            />
+            <ChatNavLink />
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/astrologer/earnings')} 
+              className="gap-2"
+            >
+              <BarChart3 className="w-4 h-4" />
+              Earnings
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/astrologer/calls/history')} 
+              className="gap-2"
+            >
+              <Phone className="w-4 h-4" />
+              Call History
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/astrologer/packages')} 
+              className="gap-2"
+            >
+              <Package className="w-4 h-4" />
+              Packages
+            </Button>
             <Button onClick={() => setShowCreateModal(true)} className="gold-gradient text-primary-foreground gap-2">
               <Plus className="w-4 h-4" />
               New Session
@@ -201,6 +267,19 @@ export default function AstrologerDashboard() {
 
       {showCreateModal && (
         <CreateSessionModal onClose={() => setShowCreateModal(false)} onCreated={handleSessionCreated} />
+      )}
+
+      {/* Incoming Call Notification */}
+      {incomingCall && (
+        <IncomingCallNotification
+          callId={incomingCall.callId}
+          userName={incomingCall.userName}
+          userPhoto={incomingCall.userPhoto}
+          callType={incomingCall.callType}
+          onAccept={handleAcceptCall}
+          onReject={handleRejectCall}
+          timeout={30}
+        />
       )}
     </div>
   );

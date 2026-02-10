@@ -4,14 +4,25 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 import { lazy, Suspense } from "react";
 import NotFound from "./pages/NotFound";
 
 const Login = lazy(() => import("./pages/Login"));
 const AstrologerDashboard = lazy(() => import("./pages/AstrologerDashboard"));
 const AstrologerLiveStream = lazy(() => import("./pages/AstrologerLiveStream"));
+const AstrologerProfile = lazy(() => import("./pages/AstrologerProfile"));
+const AstrologerList = lazy(() => import("./pages/AstrologerList"));
+const AstrologerCallHistory = lazy(() => import("./pages/AstrologerCallHistory"));
+const AstrologerEarnings = lazy(() => import("./pages/AstrologerEarnings"));
+const PackageManagement = lazy(() => import("./pages/PackageManagement"));
 const UserDashboard = lazy(() => import("./pages/UserDashboard"));
 const UserLiveViewing = lazy(() => import("./pages/UserLiveViewing"));
+const CallRinging = lazy(() => import("./pages/CallRinging"));
+const InCallUI = lazy(() => import("./pages/InCallUI"));
+const UserCallHistory = lazy(() => import("./pages/UserCallHistory"));
+const CallDetails = lazy(() => import("./pages/CallDetails"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
 
 const queryClient = new QueryClient();
 
@@ -46,9 +57,25 @@ function AppRoutes() {
         }
       />
       <Route path="/astrologer" element={<ProtectedRoute requiredRole="astrologer"><AstrologerDashboard /></ProtectedRoute>} />
+      <Route path="/astrologer/dashboard" element={<ProtectedRoute requiredRole="astrologer"><AstrologerDashboard /></ProtectedRoute>} />
       <Route path="/astrologer/live/:sessionId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerLiveStream /></ProtectedRoute>} />
+      <Route path="/astrologer/call/:callId" element={<ProtectedRoute requiredRole="astrologer"><InCallUI /></ProtectedRoute>} />
+      <Route path="/astrologer/calls/history" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCallHistory /></ProtectedRoute>} />
+      <Route path="/astrologer/calls/:callId/details" element={<ProtectedRoute requiredRole="astrologer"><CallDetails /></ProtectedRoute>} />
+      <Route path="/astrologer/earnings" element={<ProtectedRoute requiredRole="astrologer"><AstrologerEarnings /></ProtectedRoute>} />
+      <Route path="/astrologer/packages" element={<ProtectedRoute requiredRole="astrologer"><PackageManagement /></ProtectedRoute>} />
       <Route path="/user" element={<ProtectedRoute requiredRole="user"><UserDashboard /></ProtectedRoute>} />
+      <Route path="/user/astrologers" element={<ProtectedRoute requiredRole="user"><AstrologerList /></ProtectedRoute>} />
+      <Route path="/user/calls/history" element={<ProtectedRoute requiredRole="user"><UserCallHistory /></ProtectedRoute>} />
+      <Route path="/user/calls/:callId/details" element={<ProtectedRoute requiredRole="user"><CallDetails /></ProtectedRoute>} />
       <Route path="/user/live/:sessionId" element={<ProtectedRoute requiredRole="user"><UserLiveViewing /></ProtectedRoute>} />
+      <Route path="/user/astrologer/:astrologerId" element={<ProtectedRoute requiredRole="user"><AstrologerProfile /></ProtectedRoute>} />
+      <Route path="/user/call/:callId/ringing" element={<ProtectedRoute requiredRole="user"><CallRinging /></ProtectedRoute>} />
+      <Route path="/user/call/:callId" element={<ProtectedRoute requiredRole="user"><InCallUI /></ProtectedRoute>} />
+      <Route path="/astrologer/chat" element={<ProtectedRoute requiredRole="astrologer"><ChatPage /></ProtectedRoute>} />
+      <Route path="/astrologer/chat/:participantId" element={<ProtectedRoute requiredRole="astrologer"><ChatPage /></ProtectedRoute>} />
+      <Route path="/user/chat" element={<ProtectedRoute requiredRole="user"><ChatPage /></ProtectedRoute>} />
+      <Route path="/user/chat/:participantId" element={<ProtectedRoute requiredRole="user"><ChatPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
@@ -61,9 +88,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Suspense fallback={<LoadingFallback />}>
-            <AppRoutes />
-          </Suspense>
+          <ChatProvider>
+            <Suspense fallback={<LoadingFallback />}>
+              <AppRoutes />
+            </Suspense>
+          </ChatProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

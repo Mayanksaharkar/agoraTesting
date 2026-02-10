@@ -95,9 +95,23 @@ export default function AstrologerLiveStream() {
       setStats((s) => ({ ...s, ...data }));
     };
 
-    const onLiveStarted = () => {
+    const onLiveStarted = (data: any) => {
       setIsLive(true);
       setIsStarting(false);
+      
+      // If videoConfig is provided in the socket event, use it to join
+      if (data.videoConfig && !isJoined) {
+        console.log('Received videoConfig from live_started event:', data.videoConfig);
+        joinAsHost(data.videoConfig, 'local-video').catch((err) => {
+          console.error('Failed to join with videoConfig from socket:', err);
+          toast({ 
+            title: 'Video streaming issue', 
+            description: 'Connected but video may not work properly',
+            variant: 'destructive' 
+          });
+        });
+      }
+      
       toast({ title: 'You are LIVE!', description: 'Viewers can now join your stream' });
     };
 
@@ -141,23 +155,37 @@ export default function AstrologerLiveStream() {
       const videoConfig: VideoConfig = data.videoConfig || data.session?.agora;
       console.log('Video config:', videoConfig);
 
+      // Try to join with video config if available
       if (videoConfig) {
         if (!videoConfig.appId) {
           throw new Error('Agora App ID is missing. Check backend configuration.');
         }
-        await joinAsHost(videoConfig, 'local-video');
+        try {
+          await joinAsHost(videoConfig, 'local-video');
+          console.log('Successfully joined Agora channel');
+        } catch (agoraError: any) {
+          console.error('Failed to join Agora channel:', agoraError);
+          // Don't fail completely - socket event might provide config
+          toast({ 
+            title: 'Video initialization issue', 
+            description: 'Attempting to start anyway...',
+            variant: 'default'
+          });
+        }
       } else {
-        throw new Error('Video configuration not available from backend');
+        console.warn('No video config available yet - will wait for socket event');
       }
 
+      // Emit start_live event - backend will generate tokens if needed
       const socket = getSocket();
       socket?.emit('start_live', { sessionId });
+      
     } catch (err: any) {
       console.error('Failed to start live:', err);
       toast({ title: 'Failed to start', description: err.message, variant: 'destructive' });
       setIsStarting(false);
     }
-  }, [sessionId, joinAsHost, toast]);
+  }, [sessionId, joinAsHost, toast, isJoined]);
 
   const handleEndLive = useCallback(async () => {
     const socket = getSocket();

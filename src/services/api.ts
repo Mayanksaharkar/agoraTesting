@@ -65,6 +65,75 @@ export const astrologerApi = {
 
   getStats: (period = 'today') =>
     request<any>(`/api/v1/astrologer/live/stats?period=${period}`),
+
+  // Call management
+  acceptCall: (callId: string) =>
+    request<any>(`/api/v1/astrologer/calls/${callId}/accept`, {
+      method: 'POST',
+    }),
+
+  rejectCall: (callId: string) =>
+    request<any>(`/api/v1/astrologer/calls/${callId}/reject`, {
+      method: 'POST',
+    }),
+
+  endCall: (callId: string) =>
+    request<any>(`/api/v1/astrologer/calls/${callId}/end`, {
+      method: 'POST',
+    }),
+
+  confirmConnection: (callId: string) =>
+    request<any>(`/api/v1/astrologer/calls/${callId}/connected`, {
+      method: 'POST',
+    }),
+
+  getActiveCall: () =>
+    request<any>('/api/v1/astrologer/calls/active'),
+
+  getCallDetails: (callId: string) =>
+    request<any>(`/api/v1/astrologer/calls/${callId}`),
+
+  updateAvailability: (status: 'online' | 'offline') =>
+    request<any>('/api/v1/astrologer/calls/availability', {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    }),
+
+  getCallHistory: (params?: { page?: number; limit?: number; startDate?: string; endDate?: string; status?: string }) =>
+    request<any>(`/api/v1/astrologer/calls/history?${new URLSearchParams(params as any).toString()}`),
+
+  getEarnings: (period: 'all' | 'daily' | 'weekly' | 'monthly' = 'all') =>
+    request<any>(`/api/v1/astrologer/calls/earnings?period=${period}`),
+
+  getWalletSummary: () =>
+    request<any>('/api/v1/astrologer/wallet'),
+
+  requestWithdrawal: (data: { amount: number; accountDetails: { bankName: string; accountNumber: string; ifscCode: string; accountHolderName: string } }) =>
+    request<any>('/api/v1/astrologer/wallet/withdraw', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  // Package management
+  getPackages: () =>
+    request<any>('/api/v1/astrologer/packages'),
+
+  createPackage: (data: { duration: number; price: number }) =>
+    request<any>('/api/v1/astrologer/packages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updatePackage: (packageId: string, data: { duration: number; price: number }) =>
+    request<any>(`/api/v1/astrologer/packages/${packageId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  deletePackage: (packageId: string) =>
+    request<any>(`/api/v1/astrologer/packages/${packageId}`, {
+      method: 'DELETE',
+    }),
 };
 
 // User
@@ -74,4 +143,64 @@ export const userApi = {
 
   getSession: (sessionId: string) =>
     request<any>(`/api/v1/user/live/session/${sessionId}`),
+
+  getProfile: () =>
+    request<any>('/api/v1/user/profile'),
+
+  getAllAstrologers: (params?: { isOnline?: boolean; skills?: string; languages?: string; sortBy?: string }) =>
+    request<any>(`/api/v1/astrologer?${new URLSearchParams(params as any).toString()}`),
+
+  getAstrologerProfile: (astrologerId: string) =>
+    request<any>(`/api/v1/astrologer/${astrologerId}`),
+
+  getAstrologerPackages: (astrologerId: string) =>
+    request<any>(`/api/v1/user/calls/astrologers/${astrologerId}/packages`),
+
+  initiateCall: (data: any) =>
+    request<any>('/api/v1/user/calls/initiate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  cancelCall: (callId: string) =>
+    request<any>(`/api/v1/user/calls/${callId}/cancel`, {
+      method: 'POST',
+    }),
+
+  confirmConnection: (callId: string) =>
+    request<any>(`/api/v1/user/calls/${callId}/connected`, {
+      method: 'POST',
+    }),
+
+  endCall: (callId: string) =>
+    request<any>(`/api/v1/user/calls/${callId}/end`, {
+      method: 'POST',
+    }),
+
+  getCallDetails: (callId: string) =>
+    request<any>(`/api/v1/user/calls/${callId}`),
+
+  rateCall: (callId: string, data: { stars: number; review?: string }) =>
+    request<any>(`/api/v1/user/calls/${callId}/rate`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  reportCall: (callId: string, data: { reason: string }) =>
+    request<any>(`/api/v1/user/calls/${callId}/report`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  getCallHistory: (params?: { page?: number; limit?: number; startDate?: string; endDate?: string; status?: string }) =>
+    request<any>(`/api/v1/user/calls/history?${new URLSearchParams(params as any).toString()}`),
+
+  getActiveCall: () =>
+    request<any>('/api/v1/user/calls/active'),
+
+  addMoneyToWallet: (data: { amount: number; paymentGatewayId?: string; description?: string }) =>
+    request<any>('/api/v1/user/wallet/add-money', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 };

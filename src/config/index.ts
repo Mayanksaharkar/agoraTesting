@@ -15,8 +15,27 @@ export const config = {
     devTools: import.meta.env.VITE_ENABLE_DEV_TOOLS === 'true',
   },
   chat: {
-    maxMessageLength: 500,
-    messageLoadLimit: 100,
+    maxMessageLength: 2000, // Maximum characters per message (Requirement 1.3)
+    messageLoadLimit: 50, // Number of messages to load per page (Requirement 2.1, 2.2)
+    maxFileSize: 10 * 1024 * 1024, // 10MB max file size (Requirement 5.1)
+    allowedFileTypes: [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ], // Allowed MIME types (Requirement 5.1)
+    allowedFileExtensions: ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx'], // Allowed file extensions
+    typingDebounceMs: 300, // Delay before emitting typing event (Requirement 4.1)
+    typingTimeoutMs: 3000, // Time before clearing typing indicator (Requirement 4.3)
+    reconnectionAttempts: 5, // Number of reconnection attempts
+    reconnectionDelayMs: 2000, // Delay between reconnection attempts
+    cacheTTL: {
+      conversations: 24 * 60 * 60 * 1000, // 24 hours
+      messages: 60 * 60 * 1000, // 1 hour
+    },
   },
   video: {
     defaultCodec: 'vp8' as const,

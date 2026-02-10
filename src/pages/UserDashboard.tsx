@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import SessionCard from '@/components/SessionCard';
+import ChatNavLink from '@/components/ChatNavLink';
 
 interface LiveSession {
   _id: string;
@@ -90,9 +91,15 @@ export default function UserDashboard() {
               <p className="text-xs text-muted-foreground">Welcome, {user?.name || 'Explorer'}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/'); }} className="text-muted-foreground">
-            <LogOut className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <ChatNavLink />
+            <Button variant="outline" onClick={() => navigate('/user/astrologers')}>
+              Find Astrologers
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/'); }} className="text-muted-foreground">
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </header>
 

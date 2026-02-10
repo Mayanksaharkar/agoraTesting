@@ -197,23 +197,28 @@ export default function UserLiveViewing() {
     <div className="h-screen bg-background flex flex-col">
       {/* Top bar */}
       <header className="h-14 border-b border-border glass flex items-center px-4 gap-3 shrink-0">
-        {astrologer?.personalDetails?.profileImage && (
-          <img src={astrologer.personalDetails.profileImage} alt="" className="w-8 h-8 rounded-full object-cover border border-border" />
-        )}
-        <div className="min-w-0 flex-1">
-          <p className="font-display font-semibold text-foreground text-sm truncate">
-            {astrologer?.personalDetails?.pseudonym || astrologer?.personalDetails?.name || 'Astrologer'} — {session?.title || 'Live Session'}
-          </p>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-live animate-pulse-live" />
-              LIVE
-            </span>
-            <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{currentViewers}</span>
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(duration)}</span>
-            <span className="flex items-center gap-1"><Heart className="w-3 h-3 text-live" />{likes}</span>
+        <button
+          onClick={() => astrologer?._id && navigate(`/user/astrologer/${astrologer._id}`)}
+          className="flex items-center gap-3 min-w-0 flex-1 hover:opacity-80 transition-opacity"
+        >
+          {astrologer?.personalDetails?.profileImage && (
+            <img src={astrologer.personalDetails.profileImage} alt="" className="w-8 h-8 rounded-full object-cover border border-border" />
+          )}
+          <div className="min-w-0 flex-1 text-left">
+            <p className="font-display font-semibold text-foreground text-sm truncate">
+              {astrologer?.personalDetails?.pseudonym || astrologer?.personalDetails?.name || 'Astrologer'} — {session?.title || 'Live Session'}
+            </p>
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-live animate-pulse-live" />
+                LIVE
+              </span>
+              <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{currentViewers}</span>
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDuration(duration)}</span>
+              <span className="flex items-center gap-1"><Heart className="w-3 h-3 text-live" />{likes}</span>
+            </div>
           </div>
-        </div>
+        </button>
       </header>
 
       <div className="flex-1 flex overflow-hidden">
