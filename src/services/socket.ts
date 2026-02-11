@@ -119,7 +119,7 @@ function getReconnectionDelay(attempt: number): number {
  * Implements exponential backoff reconnection logic
  * Requirements: 1.1, 1.3, 1.4
  */
-export function connectSocket(token: string): Socket {
+export function connectSocket(token: string, role: string): Socket {
   if (socket?.connected) {
     return socket;
   }
@@ -131,7 +131,7 @@ export function connectSocket(token: string): Socket {
   }
 
   socket = io(config.api.socketURL, {
-    auth: { token },
+    auth: { token, role }, // Include role in the auth payload
     reconnection: true,
     reconnectionAttempts: maxReconnectionAttempts,
     reconnectionDelay: 1000,

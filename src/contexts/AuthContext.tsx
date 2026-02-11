@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(parsedUser);
             setToken(storedToken);
             setRole(storedRole);
-            connectSocket(storedToken);
+            connectSocket(storedToken, storedRole);
           } catch (err) {
             console.error('Failed to parse stored user:', err);
             // fallback to minimal user if parsing fails
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(minimalUser);
           setToken(storedToken);
           setRole(storedRole);
-          connectSocket(storedToken);
+          connectSocket(storedToken, storedRole);
         }
       }
       setIsLoading(false);
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (token) {
-      connectSocket(token);
+      connectSocket(token, role);
     }
   }, [token]);
 
@@ -125,7 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('auth_role', loginRole);
       localStorage.setItem('auth_user', JSON.stringify(userData));
       localStorage.setItem('userId', userData._id); // Store userId separately for easy access
-      connectSocket(data.token);
+      connectSocket(data.token, loginRole);
     } catch (err: any) {
       setError(err.message || 'Login failed');
       throw err;
@@ -149,7 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('auth_role', tokenRole);
     localStorage.setItem('auth_user', JSON.stringify(userData));
     localStorage.setItem('userId', userData._id); // Store userId separately
-    connectSocket(jwtToken);
+    connectSocket(jwtToken, tokenRole);
   }, []);
 
   const logout = useCallback(() => {
