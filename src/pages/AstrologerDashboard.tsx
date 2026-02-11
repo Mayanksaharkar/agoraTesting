@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3, LogOut, Phone, Package } from 'lucide-react';
+import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3, LogOut, Phone, Package, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { astrologerApi } from '@/services/api';
@@ -163,6 +163,15 @@ export default function AstrologerDashboard() {
             >
               <Package className="w-4 h-4" />
               Packages
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/astrologer/remedies')}
+              className="gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              Remedies
             </Button>
             <Button onClick={() => setShowCreateModal(true)} className="gold-gradient text-primary-foreground gap-2">
               <Plus className="w-4 h-4" />

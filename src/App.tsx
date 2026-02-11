@@ -16,6 +16,7 @@ const AstrologerList = lazy(() => import("./pages/AstrologerList"));
 const AstrologerCallHistory = lazy(() => import("./pages/AstrologerCallHistory"));
 const AstrologerEarnings = lazy(() => import("./pages/AstrologerEarnings"));
 const PackageManagement = lazy(() => import("./pages/PackageManagement"));
+const AstrologerRemediesPage = lazy(() => import("./pages/AstrologerRemediesPage"));
 const UserDashboard = lazy(() => import("./pages/UserDashboard"));
 const UserLiveViewing = lazy(() => import("./pages/UserLiveViewing"));
 const CallRinging = lazy(() => import("./pages/CallRinging"));
@@ -23,6 +24,13 @@ const InCallUI = lazy(() => import("./pages/InCallUI"));
 const UserCallHistory = lazy(() => import("./pages/UserCallHistory"));
 const CallDetails = lazy(() => import("./pages/CallDetails"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
+
+// Remedy Pages
+const RemediesPage = lazy(() => import("./pages/RemediesPage"));
+const RemedyDetailsPage = lazy(() => import("./pages/RemedyDetailsPage"));
+const RemedyBookingPage = lazy(() => import("./pages/RemedyBookingPage"));
+const UserBookingsPage = lazy(() => import("./pages/UserBookingsPage"));
+const BookingResponsePage = lazy(() => import("./pages/BookingResponsePage"));
 
 const queryClient = new QueryClient();
 
@@ -64,6 +72,7 @@ function AppRoutes() {
       <Route path="/astrologer/calls/:callId/details" element={<ProtectedRoute requiredRole="astrologer"><CallDetails /></ProtectedRoute>} />
       <Route path="/astrologer/earnings" element={<ProtectedRoute requiredRole="astrologer"><AstrologerEarnings /></ProtectedRoute>} />
       <Route path="/astrologer/packages" element={<ProtectedRoute requiredRole="astrologer"><PackageManagement /></ProtectedRoute>} />
+      <Route path="/astrologer/remedies" element={<ProtectedRoute requiredRole="astrologer"><AstrologerRemediesPage /></ProtectedRoute>} />
       <Route path="/user" element={<ProtectedRoute requiredRole="user"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user/astrologers" element={<ProtectedRoute requiredRole="user"><AstrologerList /></ProtectedRoute>} />
       <Route path="/user/calls/history" element={<ProtectedRoute requiredRole="user"><UserCallHistory /></ProtectedRoute>} />
@@ -72,6 +81,15 @@ function AppRoutes() {
       <Route path="/user/astrologer/:astrologerId" element={<ProtectedRoute requiredRole="user"><AstrologerProfile /></ProtectedRoute>} />
       <Route path="/user/call/:callId/ringing" element={<ProtectedRoute requiredRole="user"><CallRinging /></ProtectedRoute>} />
       <Route path="/user/call/:callId" element={<ProtectedRoute requiredRole="user"><InCallUI /></ProtectedRoute>} />
+      
+      {/* Remedy Routes */}
+      <Route path="/user/remedies" element={<ProtectedRoute requiredRole="user"><RemediesPage /></ProtectedRoute>} />
+      <Route path="/user/remedies/:remedyId" element={<ProtectedRoute requiredRole="user"><RemedyDetailsPage /></ProtectedRoute>} />
+      <Route path="/user/remedies/:remedyId/book/:astrologerServiceId" element={<ProtectedRoute requiredRole="user"><RemedyBookingPage /></ProtectedRoute>} />
+      <Route path="/user/bookings" element={<ProtectedRoute requiredRole="user"><UserBookingsPage /></ProtectedRoute>} />
+      <Route path="/user/bookings/:bookingId" element={<ProtectedRoute requiredRole="user"><BookingResponsePage /></ProtectedRoute>} />
+      
+      {/* Chat Routes */}
       <Route path="/astrologer/chat" element={<ProtectedRoute requiredRole="astrologer"><ChatPage /></ProtectedRoute>} />
       <Route path="/astrologer/chat/:participantId" element={<ProtectedRoute requiredRole="astrologer"><ChatPage /></ProtectedRoute>} />
       <Route path="/user/chat" element={<ProtectedRoute requiredRole="user"><ChatPage /></ProtectedRoute>} />

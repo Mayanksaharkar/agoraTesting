@@ -93,6 +93,12 @@ export default function UserDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <ChatNavLink />
+            <Button variant="outline" onClick={() => navigate('/user/remedies')} className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
+              🔮 Remedies
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/user/bookings')} className="text-blue-600 border-blue-200 hover:bg-blue-50">
+              📋 My Bookings
+            </Button>
             <Button variant="outline" onClick={() => navigate('/user/astrologers')}>
               Find Astrologers
             </Button>
@@ -143,15 +149,69 @@ export default function UserDashboard() {
             <Button onClick={fetchSessions} variant="outline" className="mt-4">Refresh</Button>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredSessions.map((session) => (
-              <SessionCard
-                key={session._id}
-                session={session}
-                onClick={() => navigate(`/user/live/${session._id}`)}
-              />
-            ))}
-          </div>
+          <>
+            {/* Remedy Flow Demo Section */}
+            <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-green-800 mb-2">
+                    🔮 Try Our New Remedy Booking Flow!
+                  </h3>
+                  <p className="text-green-700">
+                    Book personalized remedy services with expert astrologers
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => navigate('/user/remedies')} 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Browse Remedies
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => navigate('/user/bookings')}
+                    className="border-green-300 text-green-700 hover:bg-green-100"
+                  >
+                    My Bookings
+                  </Button>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="text-2xl mb-1">🕉️</div>
+                  <div className="font-medium">VIP E-Pooja</div>
+                  <div className="text-green-600">Starting ₹1199</div>
+                </div>
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="text-2xl mb-1">✋</div>
+                  <div className="font-medium">Palmistry</div>
+                  <div className="text-green-600">Starting ₹699</div>
+                </div>
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="text-2xl mb-1">💼</div>
+                  <div className="font-medium">Career</div>
+                  <div className="text-green-600">Starting ₹599</div>
+                </div>
+                <div className="text-center p-3 bg-white rounded-lg border">
+                  <div className="text-2xl mb-1">📝</div>
+                  <div className="font-medium">Name Correction</div>
+                  <div className="text-green-600">Starting ₹799</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Live Sessions Grid */}
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredSessions.map((session) => (
+                <SessionCard
+                  key={session._id}
+                  session={session}
+                  onClick={() => navigate(`/user/live/${session._id}`)}
+                />
+              ))}
+            </div>
+          </>
         )}
       </main>
     </div>
