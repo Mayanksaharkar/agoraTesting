@@ -203,4 +203,26 @@ export const userApi = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  // Courses
+  getAllCourses: (params?: { search?: string; level?: string; isFree?: boolean; courseType?: string; page?: number; limit?: number }) =>
+    request<any>(`/api/v1/user/courses/courses?${new URLSearchParams(params as any).toString()}`),
+
+  getCourseById: (courseId: string, type: 'admin' | 'astrologer') =>
+    request<any>(`/api/v1/user/courses/courses/${courseId}?type=${type}`),
+
+  enrollInCourse: (courseId: string, type: 'admin' | 'astrologer') =>
+    request<any>(`/api/v1/user/courses/courses/${courseId}/enroll`, {
+      method: 'POST',
+      body: JSON.stringify({ type })
+    }),
+
+  getMyCourses: (params?: { status?: string; page?: number; limit?: number }) =>
+    request<any>(`/api/v1/user/courses/my-courses?${new URLSearchParams(params as any).toString()}`),
+
+  getCourseJoinInfo: (courseId: string, type: 'admin' | 'astrologer') =>
+    request<any>(`/api/v1/user/courses/courses/${courseId}/join?type=${type}`),
+
+  getCourseRecording: (courseId: string, type: 'admin' | 'astrologer') =>
+    request<any>(`/api/v1/user/courses/courses/${courseId}/recording?type=${type}`),
 };

@@ -24,6 +24,9 @@ const InCallUI = lazy(() => import("./pages/InCallUI"));
 const UserCallHistory = lazy(() => import("./pages/UserCallHistory"));
 const CallDetails = lazy(() => import("./pages/CallDetails"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
+const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
+const UserCourseDetail = lazy(() => import("./pages/UserCourseDetail"));
+const UserMyCoursesPage = lazy(() => import("./pages/UserMyCoursesPage"));
 
 // Remedy Pages
 const RemediesPage = lazy(() => import("./pages/RemediesPage"));
@@ -75,10 +78,14 @@ function AppRoutes() {
       <Route path="/astrologer/remedies" element={<ProtectedRoute requiredRole="astrologer"><AstrologerRemediesPage /></ProtectedRoute>} />
       <Route path="/user" element={<ProtectedRoute requiredRole="user"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user/astrologers" element={<ProtectedRoute requiredRole="user"><AstrologerList /></ProtectedRoute>} />
+      <Route path="/user/courses" element={<ProtectedRoute requiredRole="user"><UserCoursesPage /></ProtectedRoute>} />
+      <Route path="/user/courses/:type/:courseId" element={<ProtectedRoute requiredRole="user"><UserCourseDetail /></ProtectedRoute>} />
+      <Route path="/user/my-courses" element={<ProtectedRoute requiredRole="user"><UserMyCoursesPage /></ProtectedRoute>} />
       <Route path="/user/calls/history" element={<ProtectedRoute requiredRole="user"><UserCallHistory /></ProtectedRoute>} />
       <Route path="/user/calls/:callId/details" element={<ProtectedRoute requiredRole="user"><CallDetails /></ProtectedRoute>} />
       <Route path="/user/live/:sessionId" element={<ProtectedRoute requiredRole="user"><UserLiveViewing /></ProtectedRoute>} />
       <Route path="/user/astrologer/:astrologerId" element={<ProtectedRoute requiredRole="user"><AstrologerProfile /></ProtectedRoute>} />
+      <Route path="/learn" element={<ProtectedRoute requiredRole="user"><UserCoursesPage /></ProtectedRoute>} />
       <Route path="/user/call/:callId/ringing" element={<ProtectedRoute requiredRole="user"><CallRinging /></ProtectedRoute>} />
       <Route path="/user/call/:callId" element={<ProtectedRoute requiredRole="user"><InCallUI /></ProtectedRoute>} />
       
