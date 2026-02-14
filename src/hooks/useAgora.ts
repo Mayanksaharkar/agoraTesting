@@ -57,6 +57,12 @@ export function useAgora() {
     return clientRef.current;
   }, []);
 
+  const getClient = useCallback(() => clientRef.current, []);
+  const getLocalTracks = useCallback(() => ({
+    audioTrack: audioTrackRef.current,
+    videoTrack: videoTrackRef.current,
+  }), []);
+
   const joinAsHost = useCallback(async (videoConfig: VideoConfig, localVideoEl: string) => {
     const client = initClient();
     await client.setClientRole('host');
@@ -132,5 +138,7 @@ export function useAgora() {
     toggleAudio,
     toggleVideo,
     leave,
+    getClient,
+    getLocalTracks,
   };
 }

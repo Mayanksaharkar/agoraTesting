@@ -62,14 +62,28 @@ export default function UserCourseDetail() {
     try {
       setIsJoining(true);
       const response = await userApi.getCourseJoinInfo(courseId as string, type as 'admin' | 'astrologer');
-      if (!response.data?.joinUrl) {
+      if (!response.data?.canJoin) {
         toast({
           title: 'Join unavailable',
-          description: response.data?.canJoin ? 'Join link not ready.' : 'Join window has not opened yet.'
+          description: response.data?.message || 'Join window has not opened yet.'
         });
         return;
       }
-      window.open(response.data.joinUrl, '_blank');
+      if (!response.data?.agora) {
+        toast({
+          title: 'Join unavailable',
+          description: 'Live session configuration is missing.'
+        });
+        return;
+      }
+      navigate(`/user/live-course/${courseId}`, {
+        state: {
+          agora: response.data.agora,
+          channelName: response.data.channelName,
+          courseInfo: response.data.courseInfo,
+          courseSource: type
+        }
+      });
     } catch (error: unknown) {
       toast({
         title: 'Unable to join',

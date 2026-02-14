@@ -13,12 +13,9 @@ export interface CourseRecording {
   availableUntil?: string;
 }
 
-export interface CourseZoom {
-  meetingId?: string;
-  webinarId?: string;
-  joinUrl?: string;
-  startUrl?: string;
-  password?: string;
+export interface CourseAgora {
+  channelName?: string;
+  recordingEnabled?: boolean;
 }
 
 export interface BaseCourse {
@@ -30,7 +27,7 @@ export interface BaseCourse {
   courseType?: CourseType;
   liveSchedule?: LiveSchedule;
   recording?: CourseRecording;
-  zoom?: CourseZoom;
+  agora?: CourseAgora;
 }
 
 export interface AdminCourse extends BaseCourse {

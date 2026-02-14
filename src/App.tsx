@@ -27,6 +27,8 @@ const ChatPage = lazy(() => import("./pages/ChatPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const UserCourseDetail = lazy(() => import("./pages/UserCourseDetail"));
 const UserMyCoursesPage = lazy(() => import("./pages/UserMyCoursesPage"));
+const AstrologerLiveCourse = lazy(() => import("./pages/AstrologerLiveCourse"));
+const UserLiveCourse = lazy(() => import("./pages/UserLiveCourse"));
 
 // Remedy Pages
 const RemediesPage = lazy(() => import("./pages/RemediesPage"));
@@ -70,6 +72,7 @@ function AppRoutes() {
       <Route path="/astrologer" element={<ProtectedRoute requiredRole="astrologer"><AstrologerDashboard /></ProtectedRoute>} />
       <Route path="/astrologer/dashboard" element={<ProtectedRoute requiredRole="astrologer"><AstrologerDashboard /></ProtectedRoute>} />
       <Route path="/astrologer/live/:sessionId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerLiveStream /></ProtectedRoute>} />
+      <Route path="/astrologer/live-course/:courseId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerLiveCourse /></ProtectedRoute>} />
       <Route path="/astrologer/call/:callId" element={<ProtectedRoute requiredRole="astrologer"><InCallUI /></ProtectedRoute>} />
       <Route path="/astrologer/calls/history" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCallHistory /></ProtectedRoute>} />
       <Route path="/astrologer/calls/:callId/details" element={<ProtectedRoute requiredRole="astrologer"><CallDetails /></ProtectedRoute>} />
@@ -80,6 +83,7 @@ function AppRoutes() {
       <Route path="/user/astrologers" element={<ProtectedRoute requiredRole="user"><AstrologerList /></ProtectedRoute>} />
       <Route path="/user/courses" element={<ProtectedRoute requiredRole="user"><UserCoursesPage /></ProtectedRoute>} />
       <Route path="/user/courses/:type/:courseId" element={<ProtectedRoute requiredRole="user"><UserCourseDetail /></ProtectedRoute>} />
+      <Route path="/user/live-course/:courseId" element={<ProtectedRoute requiredRole="user"><UserLiveCourse /></ProtectedRoute>} />
       <Route path="/user/my-courses" element={<ProtectedRoute requiredRole="user"><UserMyCoursesPage /></ProtectedRoute>} />
       <Route path="/user/calls/history" element={<ProtectedRoute requiredRole="user"><UserCallHistory /></ProtectedRoute>} />
       <Route path="/user/calls/:callId/details" element={<ProtectedRoute requiredRole="user"><CallDetails /></ProtectedRoute>} />

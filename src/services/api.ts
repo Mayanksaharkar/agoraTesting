@@ -134,6 +134,10 @@ export const astrologerApi = {
     request<any>(`/api/v1/astrologer/packages/${packageId}`, {
       method: 'DELETE',
     }),
+
+  // Course live
+  getCourseLiveToken: (courseId: string) =>
+    request<any>(`/api/v1/astrologer/course/${courseId}/live-token`),
 };
 
 // User
