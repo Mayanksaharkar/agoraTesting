@@ -93,6 +93,12 @@ export default function UserDashboard() {
           </div>
           <div className="flex items-center gap-2">
             <ChatNavLink />
+            <Button variant="outline" onClick={() => navigate('/user/courses')}>
+              Courses
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/user/my-courses')}>
+              My Courses
+            </Button>
             <Button variant="outline" onClick={() => navigate('/user/remedies')} className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
               🔮 Remedies
             </Button>

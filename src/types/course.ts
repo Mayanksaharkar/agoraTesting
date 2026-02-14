@@ -13,6 +13,13 @@ export interface CourseRecording {
   availableUntil?: string;
 }
 
+export interface CourseModule {
+  title?: string;
+  videoUrl?: string;
+  description?: string;
+  duration?: number;
+}
+
 export interface CourseAgora {
   channelName?: string;
   recordingEnabled?: boolean;
@@ -28,6 +35,7 @@ export interface BaseCourse {
   liveSchedule?: LiveSchedule;
   recording?: CourseRecording;
   agora?: CourseAgora;
+  modules?: CourseModule[];
 }
 
 export interface AdminCourse extends BaseCourse {

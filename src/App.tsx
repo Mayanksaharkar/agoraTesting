@@ -11,6 +11,8 @@ import NotFound from "./pages/NotFound";
 const Login = lazy(() => import("./pages/Login"));
 const AstrologerDashboard = lazy(() => import("./pages/AstrologerDashboard"));
 const AstrologerLiveStream = lazy(() => import("./pages/AstrologerLiveStream"));
+const AstrologerCoursesPage = lazy(() => import("./pages/AstrologerCoursesPage"));
+const AstrologerCourseFormPage = lazy(() => import("./pages/AstrologerCourseFormPage"));
 const AstrologerProfile = lazy(() => import("./pages/AstrologerProfile"));
 const AstrologerList = lazy(() => import("./pages/AstrologerList"));
 const AstrologerCallHistory = lazy(() => import("./pages/AstrologerCallHistory"));
@@ -71,6 +73,9 @@ function AppRoutes() {
       />
       <Route path="/astrologer" element={<ProtectedRoute requiredRole="astrologer"><AstrologerDashboard /></ProtectedRoute>} />
       <Route path="/astrologer/dashboard" element={<ProtectedRoute requiredRole="astrologer"><AstrologerDashboard /></ProtectedRoute>} />
+      <Route path="/astrologer/courses" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCoursesPage /></ProtectedRoute>} />
+      <Route path="/astrologer/courses/new" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCourseFormPage /></ProtectedRoute>} />
+      <Route path="/astrologer/courses/:courseId/edit" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCourseFormPage /></ProtectedRoute>} />
       <Route path="/astrologer/live/:sessionId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerLiveStream /></ProtectedRoute>} />
       <Route path="/astrologer/live-course/:courseId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerLiveCourse /></ProtectedRoute>} />
       <Route path="/astrologer/call/:callId" element={<ProtectedRoute requiredRole="astrologer"><InCallUI /></ProtectedRoute>} />

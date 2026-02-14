@@ -138,6 +138,27 @@ export const astrologerApi = {
   // Course live
   getCourseLiveToken: (courseId: string) =>
     request<any>(`/api/v1/astrologer/course/${courseId}/live-token`),
+
+  // Courses
+  getCourses: () =>
+    request<any>('/api/v1/astrologer/courses'),
+
+  createCourse: (data: any) =>
+    request<any>('/api/v1/astrologer/course', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+
+  updateCourse: (courseId: string, data: any) =>
+    request<any>(`/api/v1/astrologer/course/${courseId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    }),
+
+  deleteCourse: (courseId: string) =>
+    request<any>(`/api/v1/astrologer/course/${courseId}`, {
+      method: 'DELETE'
+    }),
 };
 
 // User
