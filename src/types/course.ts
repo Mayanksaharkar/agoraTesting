@@ -1,9 +1,13 @@
 export type CourseType = 'recorded' | 'live' | 'webinar';
 
 export interface LiveSchedule {
-  startTime?: string;
+  startDate?: string;
+  endDate?: string;
+  startTime?: string; // "18:00"
+  daysOfWeek?: string[]; // ['Monday', 'Tuesday', ...]
   durationMinutes?: number;
   timezone?: string;
+  frequency?: 'once' | 'daily' | 'weekly';
 }
 
 export interface CourseRecording {
@@ -14,10 +18,11 @@ export interface CourseRecording {
 }
 
 export interface CourseModule {
-  title?: string;
-  videoUrl?: string;
-  description?: string;
-  duration?: number;
+  _id?: string;
+  title: string;
+  description: string;
+  duration: number;
+  videoUrl: string;
 }
 
 export interface CourseAgora {
@@ -51,6 +56,7 @@ export interface AstrologerCourse extends BaseCourse {
     email?: string;
     profilePhoto?: string;
   };
+  status?: 'Pending' | 'Approved' | 'Rejected';
 }
 
 export interface Enrollment {
@@ -61,5 +67,9 @@ export interface Enrollment {
   recordingAccessUntil?: string;
   progress?: {
     percentage?: number;
+    completedModules?: Array<{
+      moduleId: string;
+      completedAt: string;
+    }>;
   };
 }

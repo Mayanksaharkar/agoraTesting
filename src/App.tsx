@@ -13,6 +13,7 @@ const AstrologerDashboard = lazy(() => import("./pages/AstrologerDashboard"));
 const AstrologerLiveStream = lazy(() => import("./pages/AstrologerLiveStream"));
 const AstrologerCoursesPage = lazy(() => import("./pages/AstrologerCoursesPage"));
 const AstrologerCourseFormPage = lazy(() => import("./pages/AstrologerCourseFormPage"));
+const AstrologerCoursePreview = lazy(() => import("./pages/AstrologerCoursePreview"));
 const AstrologerProfile = lazy(() => import("./pages/AstrologerProfile"));
 const AstrologerList = lazy(() => import("./pages/AstrologerList"));
 const AstrologerCallHistory = lazy(() => import("./pages/AstrologerCallHistory"));
@@ -31,6 +32,7 @@ const UserCourseDetail = lazy(() => import("./pages/UserCourseDetail"));
 const UserMyCoursesPage = lazy(() => import("./pages/UserMyCoursesPage"));
 const AstrologerLiveCourse = lazy(() => import("./pages/AstrologerLiveCourse"));
 const UserLiveCourse = lazy(() => import("./pages/UserLiveCourse"));
+const UserRecordedCourse = lazy(() => import("./pages/UserRecordedCourse"));
 
 // Remedy Pages
 const RemediesPage = lazy(() => import("./pages/RemediesPage"));
@@ -76,6 +78,7 @@ function AppRoutes() {
       <Route path="/astrologer/courses" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCoursesPage /></ProtectedRoute>} />
       <Route path="/astrologer/courses/new" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCourseFormPage /></ProtectedRoute>} />
       <Route path="/astrologer/courses/:courseId/edit" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCourseFormPage /></ProtectedRoute>} />
+      <Route path="/astrologer/course-preview/:courseId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerCoursePreview /></ProtectedRoute>} />
       <Route path="/astrologer/live/:sessionId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerLiveStream /></ProtectedRoute>} />
       <Route path="/astrologer/live-course/:courseId" element={<ProtectedRoute requiredRole="astrologer"><AstrologerLiveCourse /></ProtectedRoute>} />
       <Route path="/astrologer/call/:callId" element={<ProtectedRoute requiredRole="astrologer"><InCallUI /></ProtectedRoute>} />
@@ -89,6 +92,7 @@ function AppRoutes() {
       <Route path="/user/courses" element={<ProtectedRoute requiredRole="user"><UserCoursesPage /></ProtectedRoute>} />
       <Route path="/user/courses/:type/:courseId" element={<ProtectedRoute requiredRole="user"><UserCourseDetail /></ProtectedRoute>} />
       <Route path="/user/live-course/:courseId" element={<ProtectedRoute requiredRole="user"><UserLiveCourse /></ProtectedRoute>} />
+      <Route path="/user/recorded-course/:courseId" element={<ProtectedRoute requiredRole="user"><UserRecordedCourse /></ProtectedRoute>} />
       <Route path="/user/my-courses" element={<ProtectedRoute requiredRole="user"><UserMyCoursesPage /></ProtectedRoute>} />
       <Route path="/user/calls/history" element={<ProtectedRoute requiredRole="user"><UserCallHistory /></ProtectedRoute>} />
       <Route path="/user/calls/:callId/details" element={<ProtectedRoute requiredRole="user"><CallDetails /></ProtectedRoute>} />
@@ -97,14 +101,14 @@ function AppRoutes() {
       <Route path="/learn" element={<ProtectedRoute requiredRole="user"><UserCoursesPage /></ProtectedRoute>} />
       <Route path="/user/call/:callId/ringing" element={<ProtectedRoute requiredRole="user"><CallRinging /></ProtectedRoute>} />
       <Route path="/user/call/:callId" element={<ProtectedRoute requiredRole="user"><InCallUI /></ProtectedRoute>} />
-      
+
       {/* Remedy Routes */}
       <Route path="/user/remedies" element={<ProtectedRoute requiredRole="user"><RemediesPage /></ProtectedRoute>} />
       <Route path="/user/remedies/:remedyId" element={<ProtectedRoute requiredRole="user"><RemedyDetailsPage /></ProtectedRoute>} />
       <Route path="/user/remedies/:remedyId/book/:astrologerServiceId" element={<ProtectedRoute requiredRole="user"><RemedyBookingPage /></ProtectedRoute>} />
       <Route path="/user/bookings" element={<ProtectedRoute requiredRole="user"><UserBookingsPage /></ProtectedRoute>} />
       <Route path="/user/bookings/:bookingId" element={<ProtectedRoute requiredRole="user"><BookingResponsePage /></ProtectedRoute>} />
-      
+
       {/* Chat Routes */}
       <Route path="/astrologer/chat" element={<ProtectedRoute requiredRole="astrologer"><ChatPage /></ProtectedRoute>} />
       <Route path="/astrologer/chat/:participantId" element={<ProtectedRoute requiredRole="astrologer"><ChatPage /></ProtectedRoute>} />

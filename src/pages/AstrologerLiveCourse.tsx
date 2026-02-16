@@ -65,7 +65,7 @@ export default function AstrologerLiveCourse() {
 
   const client = getClient();
   const localTracks = useMemo(() => getLocalTracks(), [getLocalTracks, isJoined]);
-  const { isSharing, startScreenShare, stopScreenShare } = useScreenShare(client, localTracks);
+  const { isSharing, startScreenShare, stopScreenShare, screenTrack } = useScreenShare(client, localTracks);
 
   const state = location.state as LocationState | undefined;
 
@@ -112,6 +112,9 @@ export default function AstrologerLiveCourse() {
         const videoConfig = toVideoConfig(agoraConfig);
         await joinAsHost(videoConfig, 'course-local-video');
 
+        // Store videoConfig for screen share
+        (window as any).__videoConfig = videoConfig;
+
         socket?.emit('start_course_live', {
           courseId,
           astrologerId: user?._id
@@ -131,6 +134,12 @@ export default function AstrologerLiveCourse() {
 
     init();
   }, [courseId, joinAsHost, socket, state?.agora, state?.courseInfo, toVideoConfig, toast, user?._id]);
+
+  useEffect(() => {
+    if (isSharing && screenTrack && isJoined) {
+      screenTrack.play('course-local-video');
+    }
+  }, [isSharing, screenTrack, isJoined]);
 
   useEffect(() => {
     if (!socket) return;
@@ -155,8 +164,12 @@ export default function AstrologerLiveCourse() {
       setMessages((prev) => [...prev, msg]);
     };
 
-    const onStudentJoined = () => {
+    const onStudentJoined = (data: any) => {
       setParticipantCount((count) => count + 1);
+      toast({
+        title: "New Student",
+        description: `${data.name || 'A student'} has joined the session`,
+      });
     };
 
     const onParticipantLeft = () => {
@@ -182,15 +195,29 @@ export default function AstrologerLiveCourse() {
   const handleToggleScreenShare = useCallback(async () => {
     if (!courseId || !user?._id) return;
     const nextSharing = !isSharing;
-    const success = nextSharing ? await startScreenShare() : await stopScreenShare();
+
+    // Get config from window or state
+    const videoConfig = (window as any).__videoConfig;
+    if (!videoConfig) return;
+
+    const success = nextSharing
+      ? await startScreenShare(videoConfig)
+      : await stopScreenShare();
+
     if (success) {
+      if (nextSharing) {
+        setTimeout(() => localTracks.videoTrack?.play('local-video-overlay'), 500);
+      } else {
+        setTimeout(() => localTracks.videoTrack?.play('course-local-video'), 500);
+      }
+
       socket?.emit('course_screen_share', {
         courseId,
         astrologerId: user._id,
         isSharing: nextSharing
       });
     }
-  }, [courseId, isSharing, startScreenShare, stopScreenShare, socket, user?._id]);
+  }, [courseId, isSharing, startScreenShare, stopScreenShare, socket, user?._id, localTracks.videoTrack]);
 
   const handleEndLive = useCallback(async () => {
     if (courseId) {
@@ -224,6 +251,15 @@ export default function AstrologerLiveCourse() {
         <div className="flex-1 flex flex-col">
           <div className="flex-1 relative bg-secondary/20 flex items-center justify-center">
             <div id="course-local-video" ref={videoContainerRef} className="w-full h-full" />
+
+            {/* Camera Overlay when Screen Sharing */}
+            {isSharing && (
+              <div
+                id="local-video-overlay"
+                className="absolute bottom-4 right-4 w-48 h-36 bg-black rounded-lg border-2 border-primary overflow-hidden shadow-2xl z-10"
+              />
+            )}
+
             {isStarting && (
               <div className="absolute inset-0 flex items-center justify-center bg-card/80">
                 <div className="text-center">

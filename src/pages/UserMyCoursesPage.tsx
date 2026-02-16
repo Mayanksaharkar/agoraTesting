@@ -79,8 +79,26 @@ export default function UserMyCoursesPage() {
                       <Badge variant="outline">{course.courseType || 'recorded'}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2">{course.description}</p>
+
+                    {course.courseType === 'recorded' && (
+                      <div className="pt-2 space-y-1.5">
+                        <div className="flex justify-between text-[10px] font-medium text-muted-foreground">
+                          <span>Progress</span>
+                          <span>{enrollment.progress?.percentage || 0}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-500 transition-all duration-500"
+                            style={{ width: `${enrollment.progress?.percentage || 0}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between pt-2">
-                      <Badge variant="secondary">{enrollment.status}</Badge>
+                      <Badge variant="secondary" className={enrollment.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : ''}>
+                        {enrollment.status}
+                      </Badge>
                       <Button size="sm" variant="outline" onClick={() => navigate(`/user/courses/${type}/${course._id}`)}>
                         Open
                       </Button>

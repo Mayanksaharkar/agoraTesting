@@ -122,9 +122,39 @@ export default function UserLiveCourse() {
   }, [isJoined]);
 
   useEffect(() => {
-    if (remoteUsers.length > 0 && remoteVideoRef.current) {
-      const userVideo = remoteUsers[0];
-      userVideo.videoTrack?.play(remoteVideoRef.current);
+    if (remoteUsers.length > 0) {
+      // Logic to distinguish camera and screen share:
+      // When both are present, they will have a 1000 UID difference.
+      // The higher one is the screen share.
+      const sortedUsers = [...remoteUsers].sort((a, b) => Number(a.uid) - Number(b.uid));
+
+      let cameraUser = sortedUsers[0];
+      let screenUser = null;
+
+      if (sortedUsers.length > 1) {
+        // If we have two related UIDs (difference around 1000), the larger one is screen share
+        if (Math.abs(Number(sortedUsers[1].uid) - Number(sortedUsers[0].uid)) === 1000) {
+          cameraUser = sortedUsers[0];
+          screenUser = sortedUsers[1];
+        }
+      }
+
+      // Play Screen Share in main panel if available
+      if (screenUser && remoteVideoRef.current) {
+        screenUser.videoTrack?.play(remoteVideoRef.current);
+      } else if (cameraUser && remoteVideoRef.current) {
+        cameraUser.videoTrack?.play(remoteVideoRef.current);
+      }
+
+      // If both are available, show camera in the overlay
+      if (screenUser && cameraUser) {
+        setTimeout(() => {
+          const overlayEl = document.getElementById('remote-video-overlay');
+          if (overlayEl) {
+            cameraUser.videoTrack?.play(overlayEl);
+          }
+        }, 1000);
+      }
     }
   }, [remoteUsers]);
 
@@ -208,6 +238,14 @@ export default function UserLiveCourse() {
         <div className="flex-1 flex flex-col">
           <div className="flex-1 relative bg-secondary/20 flex items-center justify-center">
             <div ref={remoteVideoRef} className="w-full h-full" />
+
+            {/* Camera Overlay for Student */}
+            {remoteUsers.length > 1 && (
+              <div
+                id="remote-video-overlay"
+                className="absolute bottom-4 right-4 w-48 h-36 bg-black rounded-lg border-2 border-primary overflow-hidden shadow-2xl z-10"
+              />
+            )}
 
             {isConnecting && (
               <div className="absolute inset-0 flex items-center justify-center bg-card/80">

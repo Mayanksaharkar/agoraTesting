@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Pencil, Radio, RefreshCw, Trash2 } from 'lucide-react';
+import { Calendar, Pencil, Radio, RefreshCw, Trash2, Play } from 'lucide-react';
 import { astrologerApi } from '@/services/api';
 import type { AstrologerCourse } from '@/types/course';
 import { Button } from '@/components/ui/button';
@@ -35,12 +35,49 @@ export default function AstrologerCoursesPage() {
   }, [loadCourses]);
 
   const canGoLive = (course: AstrologerCourse) => {
-    if (!course.liveSchedule?.startTime || !course.liveSchedule?.durationMinutes) return false;
-    const start = new Date(course.liveSchedule.startTime).getTime();
-    const end = start + (course.liveSchedule.durationMinutes || 0) * 60000;
-    const now = Date.now();
-    const canJoinFrom = start - 15 * 60000;
-    return now >= canJoinFrom && now <= end;
+    const { liveSchedule } = course;
+    if (!liveSchedule || !liveSchedule.durationMinutes) return false;
+
+    const now = new Date();
+
+    // One-time session
+    if (liveSchedule.frequency === 'once' || !liveSchedule.startTime?.includes(':')) {
+      if (!liveSchedule.startTime) return false;
+      const start = new Date(liveSchedule.startTime).getTime();
+      const end = start + (liveSchedule.durationMinutes || 0) * 60000;
+      const canJoinFrom = start - 15 * 60000;
+      return now.getTime() >= canJoinFrom && now.getTime() <= end;
+    }
+
+    // Recurring schedule - Normalize dates to midnight for comparison
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    if (liveSchedule.startDate) {
+      const start = new Date(liveSchedule.startDate);
+      const normalizedStart = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      if (today < normalizedStart) return false;
+    }
+    
+    if (liveSchedule.endDate) {
+      const end = new Date(liveSchedule.endDate);
+      const normalizedEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+      if (today > normalizedEnd) return false;
+    }
+
+    if (liveSchedule.frequency === 'weekly' && liveSchedule.daysOfWeek) {
+      const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const currentDay = DAYS[now.getDay()];
+      if (!liveSchedule.daysOfWeek.includes(currentDay)) return false;
+    }
+
+    const [hours, minutes] = liveSchedule.startTime.split(':').map(Number);
+    const start = new Date(now);
+    start.setHours(hours, minutes, 0, 0);
+
+    const end = start.getTime() + (liveSchedule.durationMinutes || 0) * 60000;
+    const canJoinFrom = start.getTime() - 15 * 60000;
+
+    return now.getTime() >= canJoinFrom && now.getTime() <= end;
   };
 
   const handleGoLive = async (course: AstrologerCourse) => {
@@ -106,10 +143,27 @@ export default function AstrologerCoursesPage() {
                       <Badge variant="outline">{course.courseType || 'recorded'}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2">{course.description}</p>
-                    {startTime && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {startTime.toLocaleString()}
+                    {course.liveSchedule && isLiveCourse && (
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>
+                            {course.liveSchedule.frequency === 'once' ? (
+                              course.liveSchedule.startDate ? new Date(course.liveSchedule.startDate).toLocaleDateString() : 'N/A'
+                            ) : (
+                              `${course.liveSchedule.startTime || 'N/A'} (${course.liveSchedule.frequency || 'recurring'})`
+                            )}
+                          </span>
+                        </div>
+                        {course.liveSchedule.daysOfWeek && course.liveSchedule.daysOfWeek.length > 0 && course.liveSchedule.frequency === 'weekly' && (
+                          <div className="flex flex-wrap gap-1">
+                            {course.liveSchedule.daysOfWeek.map(d => (
+                              <Badge key={d} variant="secondary" className="text-[8px] h-3.5 px-1 bg-amber-50 text-amber-700 border-amber-100">
+                                {d.substring(0, 3)}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                     <div className="flex items-center gap-2">
@@ -117,20 +171,28 @@ export default function AstrologerCoursesPage() {
                       <Badge variant="outline">{course.isFree || course.price === 0 ? 'Free' : `₹${course.price}`}</Badge>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {isLiveCourse && (
+                      {isLiveCourse ? (
                         <Button
                           onClick={() => handleGoLive(course)}
                           disabled={!canGoLive(course)}
-                          className="bg-emerald-600 hover:bg-emerald-700 gap-2"
+                          className="bg-emerald-600 hover:bg-emerald-700 gap-2 flex-1 sm:flex-none"
                         >
                           <Radio className="w-4 h-4" />
                           {canGoLive(course) ? 'Go Live' : 'Not Live Yet'}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="secondary"
+                          onClick={() => navigate(`/astrologer/course-preview/${course._id}`, { state: { course } })}
+                          className="bg-amber-100 text-amber-700 hover:bg-amber-200 gap-2 flex-1 sm:flex-none"
+                        >
+                          <Play className="w-4 h-4" /> View Content
                         </Button>
                       )}
                       <Button
                         variant="outline"
                         onClick={() => navigate(`/astrologer/courses/${course._id}/edit`)}
-                        className="gap-2"
+                        className="gap-2 flex-1 sm:flex-none"
                       >
                         <Pencil className="w-4 h-4" /> Edit
                       </Button>

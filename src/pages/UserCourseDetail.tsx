@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Calendar, ExternalLink, Video, Radio, ArrowLeft } from 'lucide-react';
+import { Calendar, ExternalLink, Video, Radio, ArrowLeft, Clock, Play } from 'lucide-react';
 import { userApi } from '@/services/api';
 import type { AdminCourse, AstrologerCourse } from '@/types/course';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ export default function UserCourseDetail() {
 
   const [course, setCourse] = useState<AdminCourse | AstrologerCourse | null>(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrollment, setEnrollment] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
   const [isRecordingLoading, setIsRecordingLoading] = useState(false);
@@ -25,6 +26,7 @@ export default function UserCourseDetail() {
       const response = await userApi.getCourseById(courseId as string, type as 'admin' | 'astrologer');
       setCourse(response.data.course);
       setIsEnrolled(response.data.isEnrolled);
+      setEnrollment(response.data.enrollment);
     } catch (error: unknown) {
       toast({
         title: 'Failed to load course',
@@ -45,6 +47,7 @@ export default function UserCourseDetail() {
     try {
       const response = await userApi.enrollInCourse(courseId as string, type as 'admin' | 'astrologer');
       setIsEnrolled(true);
+      setEnrollment(response.data);
       toast({
         title: 'Enrolled',
         description: response.message || 'You are enrolled in this course.'
@@ -118,6 +121,17 @@ export default function UserCourseDetail() {
     }
   };
 
+  const handleWatchModule = (module: any) => {
+    if (!isEnrolled) return;
+    navigate(`/user/recorded-course/${courseId}`, {
+      state: {
+        courseInfo: course,
+        activeModule: module,
+        enrollment: enrollment
+      }
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -160,10 +174,41 @@ export default function UserCourseDetail() {
               <Badge variant="outline">{course.isFree || course.price === 0 ? 'Free' : `₹${course.price}`}</Badge>
             </div>
             <p className="text-gray-700">{course.description}</p>
-            {startTime && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="w-4 h-4" />
-                <span>{startTime.toLocaleString()}</span>
+            {course.liveSchedule && isLiveCourse && (
+              <div className="space-y-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                <div className="flex items-center gap-2 text-amber-900 font-semibold">
+                  <Calendar className="w-4 h-4" />
+                  <span>Class Schedule</span>
+                </div>
+                <div className="grid gap-2 text-sm text-gray-700">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Period:</span>
+                    <span className="font-medium">
+                      {course.liveSchedule.startDate ? new Date(course.liveSchedule.startDate).toLocaleDateString() : 'N/A'} - {course.liveSchedule.endDate ? new Date(course.liveSchedule.endDate).toLocaleDateString() : 'N/A'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Time:</span>
+                    <span className="font-medium flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {course.liveSchedule.startTime || 'N/A'} ({course.liveSchedule.durationMinutes} mins)
+                    </span>
+                  </div>
+                  {course.liveSchedule.daysOfWeek && course.liveSchedule.daysOfWeek.length > 0 && (
+                    <div className="flex items-start justify-between">
+                      <span className="text-muted-foreground">Days:</span>
+                      <div className="flex flex-wrap gap-1 justify-end max-w-[60%]">
+                        {course.liveSchedule.daysOfWeek.map(day => (
+                          <Badge key={day} variant="secondary" className="text-[10px] h-4 px-1 bg-white border-amber-200 text-amber-900">{day.substring(0, 3)}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Frequency:</span>
+                    <Badge variant="outline" className="capitalize text-[10px] h-4">{course.liveSchedule.frequency || 'once'}</Badge>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -188,7 +233,56 @@ export default function UserCourseDetail() {
                   <ExternalLink className="w-4 h-4 ml-2" />
                 </Button>
               )}
+
+              {isEnrolled && courseType === 'recorded' && course.modules && course.modules.length > 0 && (
+                <Button onClick={() => handleWatchModule(course.modules![0])} className="bg-emerald-600 hover:bg-emerald-700">
+                  <Play className="w-4 h-4 mr-2" />
+                  Start Course
+                </Button>
+              )}
             </div>
+
+            {course.modules && course.modules.length > 0 && (
+              <div className="pt-6 border-t border-amber-100">
+                <h3 className="font-semibold text-gray-900 mb-4">Course Content</h3>
+                <div className="space-y-3">
+                  {course.modules.map((module, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between p-4 rounded-xl border ${isEnrolled ? 'bg-white border-amber-50 cursor-pointer hover:border-amber-200 transition-colors' : 'bg-gray-50 border-gray-100 opacity-80'}`}
+                      onClick={() => isEnrolled && handleWatchModule(module)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 font-display font-bold">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">{module.title}</p>
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {module.duration} mins</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {isEnrolled && enrollment?.progress?.completedModules?.some((m: any) => m.moduleId === (module._id || module.title)) && (
+                          <Badge className="bg-emerald-500 text-white border-none text-[10px] h-5">Completed</Badge>
+                        )}
+                        {!isEnrolled && (
+                          <Badge variant="outline" className="text-[10px] h-5 bg-gray-50">Locked</Badge>
+                        )}
+                        {isEnrolled ? (
+                          <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 group-hover:bg-amber-100 transition-colors">
+                            <Play className="w-5 h-5 fill-current" />
+                          </div>
+                        ) : (
+                          <Video className="w-5 h-5 text-gray-300" />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>

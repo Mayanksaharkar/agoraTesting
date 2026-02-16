@@ -250,4 +250,10 @@ export const userApi = {
 
   getCourseRecording: (courseId: string, type: 'admin' | 'astrologer') =>
     request<any>(`/api/v1/user/courses/courses/${courseId}/recording?type=${type}`),
+
+  updateCourseProgress: (enrollmentId: string, moduleId: string, completed: boolean) =>
+    request<any>(`/api/v1/user/courses/enrollments/${enrollmentId}/progress`, {
+      method: 'PUT',
+      body: JSON.stringify({ moduleId, completed })
+    }),
 };
