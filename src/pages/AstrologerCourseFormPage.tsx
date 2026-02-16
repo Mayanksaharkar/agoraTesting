@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Calendar, Plus, Trash2, Video, Clock, Play, ArrowLeft } from "lucide-react";
+import { Calendar, Plus, Trash2, Video, Clock, Play, ArrowLeft, FileText, Headphones, Package, Youtube, Upload } from "lucide-react";
 import { astrologerApi } from "@/services/api";
 import type { AstrologerCourse, CourseType, CourseModule } from "@/types/course";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ type FormState = {
   recordingEnabled: boolean;
   recordingAvailabilityDays: string;
   modules: any[];
+  resources: any[];
 };
 
 const pad = (num: number) => num.toString().padStart(2, "0");
@@ -50,6 +51,7 @@ const DEFAULT_FORM: FormState = {
   recordingEnabled: false,
   recordingAvailabilityDays: "",
   modules: [],
+  resources: [],
 };
 
 export default function AstrologerCourseFormPage() {
@@ -61,6 +63,40 @@ export default function AstrologerCourseFormPage() {
   const [isLoading, setIsLoading] = useState(Boolean(courseId));
 
   const isEditing = useMemo(() => Boolean(courseId), [courseId]);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+
+  const handleVideoUpload = async (index: number, file: File) => {
+    if (!file) return;
+
+    if (!form.title) {
+      toast({ title: "Course title required", description: "Please enter a course title before uploading videos.", variant: "destructive" });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('video', file);
+    formData.append('title', form.modules[index].title || file.name);
+    formData.append('courseTitle', form.title);
+
+    setUploadingIndex(index);
+    try {
+      const response = await astrologerApi.uploadCourseVideo(formData);
+      if (response.success) {
+        updateModule(index, 'videoUrl', response.data.videoUrl);
+        toast({ title: "Video uploaded to YouTube", description: "The URL has been automatically filled." });
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Upload failed",
+        description: error.message || "Could not upload video",
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingIndex(null);
+    }
+  };
 
   useEffect(() => {
     if (!courseId) return;
@@ -105,6 +141,13 @@ export default function AstrologerCourseFormPage() {
             duration: m.duration || 0,
             videoUrl: m.videoUrl || "",
           })),
+          resources: (course.resources || []).map((r: any) => ({
+            title: r.title || "",
+            resourceType: r.resourceType || "ebook",
+            fileUrl: r.fileUrl || "",
+            description: r.description || "",
+            duration: r.duration || 0,
+          })),
         });
       } catch (error: unknown) {
         toast({
@@ -147,6 +190,26 @@ export default function AstrologerCourseFormPage() {
     );
   };
 
+  const addResource = () => {
+    updateField("resources", [
+      ...form.resources,
+      { title: "", resourceType: "ebook", fileUrl: "", description: "", duration: 0 },
+    ]);
+  };
+
+  const updateResource = (index: number, field: string, value: any) => {
+    const nextResources = [...form.resources];
+    nextResources[index] = { ...nextResources[index], [field]: value };
+    updateField("resources", nextResources);
+  };
+
+  const removeResource = (index: number) => {
+    updateField(
+      "resources",
+      form.resources.filter((_, i) => i !== index),
+    );
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!form.title.trim()) {
@@ -163,6 +226,7 @@ export default function AstrologerCourseFormPage() {
         isFree: form.isFree,
         price: form.isFree ? 0 : Number(form.price || 0),
         modules: form.modules,
+        resources: form.resources,
       };
 
       if (form.courseType !== "recorded") {
@@ -458,12 +522,48 @@ export default function AstrologerCourseFormPage() {
                                     />
                                   </div>
                                   <div className="space-y-2">
-                                    <Label>Video URL</Label>
-                                    <Input
-                                      value={module.videoUrl}
-                                      onChange={(e) => updateModule(index, "videoUrl", e.target.value)}
-                                      placeholder="https://..."
-                                    />
+                                    <Label>Video Selection</Label>
+                                    <div className="flex gap-2">
+                                      <div className="flex-1 relative">
+                                        <Input
+                                          value={module.videoUrl}
+                                          onChange={(e) => updateModule(index, "videoUrl", e.target.value)}
+                                          placeholder="YouTube URL or Upload video"
+                                          className="pr-10"
+                                        />
+                                        {module.videoUrl.includes('youtube.com') && (
+                                          <Youtube className="w-4 h-4 text-red-600 absolute right-3 top-3" />
+                                        )}
+                                      </div>
+                                      <div className="relative">
+                                        <Input
+                                          type="file"
+                                          accept="video/*"
+                                          className="hidden"
+                                          id={`video-upload-${index}`}
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleVideoUpload(index, file);
+                                          }}
+                                          disabled={uploadingIndex === index}
+                                        />
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="icon"
+                                          asChild
+                                          className={uploadingIndex === index ? "animate-pulse" : ""}
+                                        >
+                                          <label htmlFor={`video-upload-${index}`} className="cursor-pointer">
+                                            {uploadingIndex === index ? (
+                                              <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                              <Upload className="w-4 h-4" />
+                                            )}
+                                          </label>
+                                        </Button>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                                 <div className="grid gap-4 sm:grid-cols-2">
@@ -492,6 +592,112 @@ export default function AstrologerCourseFormPage() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => removeModule(index)}
+                                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Resources Section */}
+                <div className="space-y-4 pt-4 border-t border-amber-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900">Course Resources</h3>
+                      <p className="text-sm text-muted-foreground">Add digital books, audiobooks, or other materials</p>
+                    </div>
+                    <Button type="button" variant="outline" size="sm" onClick={addResource} className="gap-2">
+                      <Plus className="w-4 h-4" /> Add Resource
+                    </Button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {form.resources.length === 0 ? (
+                      <div className="text-center py-8 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50">
+                        <Package className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">No resources added yet.</p>
+                      </div>
+                    ) : (
+                      form.resources.map((resource, index) => (
+                        <Card key={index} className="border-emerald-50 bg-white shadow-sm overflow-hidden">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4 mb-4">
+                              <div className="flex-1 space-y-4">
+                                <div className="grid gap-4 sm:grid-cols-3">
+                                  <div className="space-y-2">
+                                    <Label>Title</Label>
+                                    <Input
+                                      value={resource.title}
+                                      onChange={(e) => updateResource(index, "title", e.target.value)}
+                                      placeholder="e.g. Master Astrology eBook"
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>Type</Label>
+                                    <Select
+                                      value={resource.resourceType}
+                                      onValueChange={(value) => updateResource(index, "resourceType", value)}
+                                    >
+                                      <SelectTrigger>
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="ebook">eBook (PDF/EPUB)</SelectItem>
+                                        <SelectItem value="audiobook">Audiobook (MP3)</SelectItem>
+                                        <SelectItem value="other">Other Material</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label>File URL</Label>
+                                    <Input
+                                      value={resource.fileUrl}
+                                      onChange={(e) => updateResource(index, "fileUrl", e.target.value)}
+                                      placeholder="https://..."
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                  <div className="space-y-2">
+                                    <Label>Description (Optional)</Label>
+                                    <Textarea
+                                      value={resource.description}
+                                      onChange={(e) => updateResource(index, "description", e.target.value)}
+                                      placeholder="Short description of the resource"
+                                      rows={2}
+                                    />
+                                  </div>
+                                  <div className="space-y-4">
+                                    {resource.resourceType === "audiobook" && (
+                                      <div className="space-y-2">
+                                        <Label>Duration (minutes)</Label>
+                                        <Input
+                                          type="number"
+                                          value={resource.duration}
+                                          onChange={(e) => updateResource(index, "duration", Number(e.target.value))}
+                                          placeholder="60"
+                                        />
+                                      </div>
+                                    )}
+                                    <div className="flex items-center gap-2 pt-2">
+                                      {resource.resourceType === 'ebook' && <FileText className="w-5 h-5 text-blue-500" />}
+                                      {resource.resourceType === 'audiobook' && <Headphones className="w-5 h-5 text-purple-500" />}
+                                      {resource.resourceType === 'other' && <Package className="w-5 h-5 text-gray-500" />}
+                                      <span className="text-xs font-medium uppercase text-muted-foreground">{resource.resourceType}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeResource(index)}
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50"
                               >
                                 <Trash2 className="w-4 h-4" />

@@ -30,6 +30,15 @@ export interface CourseAgora {
   recordingEnabled?: boolean;
 }
 
+export interface CourseResource {
+  _id?: string;
+  title: string;
+  resourceType: 'ebook' | 'audiobook' | 'other';
+  fileUrl: string;
+  description?: string;
+  duration?: number;
+}
+
 export interface BaseCourse {
   _id: string;
   title: string;
@@ -41,6 +50,7 @@ export interface BaseCourse {
   recording?: CourseRecording;
   agora?: CourseAgora;
   modules?: CourseModule[];
+  resources?: CourseResource[];
 }
 
 export interface AdminCourse extends BaseCourse {

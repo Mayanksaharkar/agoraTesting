@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Calendar, ExternalLink, Video, Radio, ArrowLeft, Clock, Play } from 'lucide-react';
+import { Calendar, ExternalLink, Video, Radio, ArrowLeft, Clock, Play, FileText, Headphones, Package, Download } from 'lucide-react';
 import { userApi } from '@/services/api';
 import type { AdminCourse, AstrologerCourse } from '@/types/course';
 import { Button } from '@/components/ui/button';
@@ -278,6 +278,42 @@ export default function UserCourseDetail() {
                           <Video className="w-5 h-5 text-gray-300" />
                         )}
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {course.resources && course.resources.length > 0 && (
+              <div className="pt-6 border-t border-amber-100">
+                <h3 className="font-semibold text-gray-900 mb-4">Learning Materials</h3>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {course.resources.map((resource, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between p-4 rounded-xl border ${isEnrolled ? 'bg-white border-emerald-50 cursor-pointer hover:border-emerald-200 transition-colors' : 'bg-gray-50 border-gray-100 opacity-80'}`}
+                      onClick={() => isEnrolled && resource.fileUrl && window.open(resource.fileUrl, '_blank')}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${resource.resourceType === 'ebook' ? 'bg-blue-50 text-blue-600' : resource.resourceType === 'audiobook' ? 'bg-purple-50 text-purple-600' : 'bg-gray-50 text-gray-600'}`}>
+                          {resource.resourceType === 'ebook' && <FileText className="w-5 h-5" />}
+                          {resource.resourceType === 'audiobook' && <Headphones className="w-5 h-5" />}
+                          {resource.resourceType === 'other' && <Package className="w-5 h-5" />}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm line-clamp-1">{resource.title}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <Badge variant="outline" className="text-[9px] h-4 px-1 uppercase">{resource.resourceType}</Badge>
+                            {resource.duration && resource.resourceType === 'audiobook' && (
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                <Clock className="w-2.5 h-2.5" /> {resource.duration}m
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <Button size="icon" variant="ghost" className={isEnrolled ? "text-emerald-600" : "text-gray-300"} disabled={!isEnrolled}>
+                        <Download className="w-4 h-4" />
+                      </Button>
                     </div>
                   ))}
                 </div>

@@ -159,6 +159,17 @@ export const astrologerApi = {
     request<any>(`/api/v1/astrologer/course/${courseId}`, {
       method: 'DELETE'
     }),
+
+  uploadCourseVideo: (formData: FormData) => {
+    const token = localStorage.getItem('auth_token');
+    return fetch(`${BASE_URL}/api/v1/astrologer/course/upload-video`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    }).then(res => res.json());
+  },
 };
 
 // User
