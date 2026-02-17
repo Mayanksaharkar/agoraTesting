@@ -23,7 +23,7 @@ export default function AstrologerLiveStream() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { isJoined, isAudioOn, isVideoOn, joinAsHost, toggleAudio, toggleVideo, leave } = useAgora();
+  const { isJoined, isAudioOn, isVideoOn, joinAsHost, toggleAudio, toggleVideo, leave, startLiveStreaming } = useAgora();
 
   const [isLive, setIsLive] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
@@ -98,20 +98,31 @@ export default function AstrologerLiveStream() {
     const onLiveStarted = (data: any) => {
       setIsLive(true);
       setIsStarting(false);
-      
+
+      const currentSession = data.session;
+
       // If videoConfig is provided in the socket event, use it to join
       if (data.videoConfig && !isJoined) {
         console.log('Received videoConfig from live_started event:', data.videoConfig);
-        joinAsHost(data.videoConfig, 'local-video').catch((err) => {
+        joinAsHost(data.videoConfig, 'local-video').then(() => {
+          // If platform is YouTube, start pushing to CDN
+          if (currentSession?.streamSettings?.streamPlatform === 'youtube' && currentSession?.youtube?.rtmpUrl) {
+            const combinedUrl = `${currentSession.youtube.rtmpUrl}/${currentSession.youtube.streamKey}`;
+            startLiveStreaming(combinedUrl).catch(err => {
+              console.error('Failed to start YouTube push:', err);
+              toast({ title: "YouTube Push Failed", description: "Video is streaming but not being recorded to YouTube.", variant: "destructive" });
+            });
+          }
+        }).catch((err) => {
           console.error('Failed to join with videoConfig from socket:', err);
-          toast({ 
-            title: 'Video streaming issue', 
+          toast({
+            title: 'Video streaming issue',
             description: 'Connected but video may not work properly',
-            variant: 'destructive' 
+            variant: 'destructive'
           });
         });
       }
-      
+
       toast({ title: 'You are LIVE!', description: 'Viewers can now join your stream' });
     };
 
@@ -151,7 +162,7 @@ export default function AstrologerLiveStream() {
       // Fetch session details for video config
       const data = await astrologerApi.getSession(sessionId);
       console.log('Session data:', data);
-      
+
       const videoConfig: VideoConfig = data.videoConfig || data.session?.agora;
       console.log('Video config:', videoConfig);
 
@@ -166,8 +177,8 @@ export default function AstrologerLiveStream() {
         } catch (agoraError: any) {
           console.error('Failed to join Agora channel:', agoraError);
           // Don't fail completely - socket event might provide config
-          toast({ 
-            title: 'Video initialization issue', 
+          toast({
+            title: 'Video initialization issue',
             description: 'Attempting to start anyway...',
             variant: 'default'
           });
@@ -179,7 +190,7 @@ export default function AstrologerLiveStream() {
       // Emit start_live event - backend will generate tokens if needed
       const socket = getSocket();
       socket?.emit('start_live', { sessionId });
-      
+
     } catch (err: any) {
       console.error('Failed to start live:', err);
       toast({ title: 'Failed to start', description: err.message, variant: 'destructive' });
@@ -275,7 +286,7 @@ export default function AstrologerLiveStream() {
             messages={messages}
             canDelete
             onDeleteMessage={handleDeleteMessage}
-            onSendMessage={() => {}}
+            onSendMessage={() => { }}
             isHost
           />
         </div>

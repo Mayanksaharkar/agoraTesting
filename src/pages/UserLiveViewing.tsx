@@ -57,7 +57,7 @@ export default function UserLiveViewing() {
       try {
         const data = await userApi.getSession(sessionId);
         console.log('User session data:', data);
-        
+
         setSession(data.session);
         setMessages(data.session?.messages || []);
         setLikes(data.session?.stats?.totalLikes || 0);
@@ -225,7 +225,20 @@ export default function UserLiveViewing() {
         {/* Video */}
         <div className="flex-1 flex flex-col">
           <div className="flex-1 relative bg-secondary/20 flex items-center justify-center">
-            <div ref={remoteVideoRef} className="w-full h-full" />
+            {session?.streamSettings?.streamPlatform === 'youtube' && session?.youtube?.broadcastId ? (
+              <div className="w-full h-full">
+                <iframe
+                  src={`https://www.youtube.com/embed/${session.youtube.broadcastId}?autoplay=1&mute=0&rel=0`}
+                  title="YouTube Live Stream"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full aspect-video"
+                />
+              </div>
+            ) : (
+              <div ref={remoteVideoRef} className="w-full h-full" />
+            )}
 
             {isConnecting && (
               <div className="absolute inset-0 flex items-center justify-center bg-card/80">
@@ -236,7 +249,7 @@ export default function UserLiveViewing() {
               </div>
             )}
 
-            {isEnded && (
+            {isEnded && !(session?.youtube?.broadcastId && session?.status === 'ended') && (
               <div className="absolute inset-0 flex items-center justify-center bg-card/90">
                 <div className="text-center">
                   <p className="text-2xl font-display text-foreground mb-2">Stream Ended</p>
@@ -248,9 +261,22 @@ export default function UserLiveViewing() {
               </div>
             )}
 
-            {!isConnecting && !isEnded && remoteUsers.length === 0 && (
+            {/* Show recording available message for ended YouTube sessions */}
+            {session?.status === 'ended' && session?.youtube?.broadcastId && (
+              <div className="absolute top-4 left-4 right-4 bg-emerald-600/90 text-white px-4 py-2 rounded-lg shadow-lg">
+                <p className="text-sm font-medium">📹 This session has ended. You're watching the recording.</p>
+              </div>
+            )}
+
+            {!isConnecting && !isEnded && session?.streamSettings?.streamPlatform === 'agora' && remoteUsers.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <p className="text-muted-foreground">Waiting for astrologer's video...</p>
+              </div>
+            )}
+
+            {!isConnecting && !isEnded && session?.streamSettings?.streamPlatform === 'youtube' && !session?.youtube?.broadcastId && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-muted-foreground">YouTube Live not initialized yet...</p>
               </div>
             )}
           </div>

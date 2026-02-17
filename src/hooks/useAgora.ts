@@ -140,5 +140,43 @@ export function useAgora() {
     leave,
     getClient,
     getLocalTracks,
+    startLiveStreaming: useCallback(async (rtmpUrl: string) => {
+      if (!clientRef.current || !isJoined) {
+        console.warn('Cannot start streaming: Client not initialized or not joined');
+        return;
+      }
+      
+      const config = {
+        width: 1280,
+        height: 720,
+        videoBitrate: 2500,
+        videoFramerate: 30,
+        lowLatency: false,
+        backgroundColor: 0x000000,
+        videoCodecProfile: 100 as 100 | 66 | 77, // High profile
+        transcodingUsers: [
+          {
+            uid: clientRef.current.uid as number,
+            x: 0,
+            y: 0,
+            width: 1280,
+            height: 720,
+            zOrder: 1,
+            alpha: 1,
+            audioChannel: 0,
+          },
+        ],
+      };
+
+      try {
+        await clientRef.current.setLiveTranscoding(config);
+        // Second param 'true' means transcoding is enabled
+        await clientRef.current.startLiveStreaming(rtmpUrl, true);
+        console.log('RTMP Streaming started to:', rtmpUrl);
+      } catch (error) {
+        console.error('Failed to start RTMP streaming:', error);
+        throw error;
+      }
+    }, [isJoined]),
   };
 }

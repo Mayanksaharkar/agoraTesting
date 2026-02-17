@@ -26,6 +26,7 @@ export default function CreateSessionModal({ onClose, onCreated }: CreateSession
     maxViewers: 1000,
     isMonetized: false,
     entryFee: 0,
+    streamPlatform: 'agora',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,17 +113,28 @@ export default function CreateSessionModal({ onClose, onCreated }: CreateSession
             />
           </div>
 
-          <div className="flex items-center justify-between py-2">
+          <div className="flex items-center justify-between py-1">
+            <div className="space-y-0.5">
+              <Label className="text-secondary-foreground">Save to YouTube</Label>
+              <p className="text-[10px] text-muted-foreground">Records and saves your live session automatically</p>
+            </div>
+            <Switch
+              checked={form.streamPlatform === 'youtube'}
+              onCheckedChange={(v) => setForm({ ...form, streamPlatform: v ? 'youtube' : 'agora' })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-1">
             <Label className="text-secondary-foreground">Allow Chat</Label>
             <Switch checked={form.allowChat} onCheckedChange={(v) => setForm({ ...form, allowChat: v })} />
           </div>
 
-          <div className="flex items-center justify-between py-2">
+          <div className="flex items-center justify-between py-1">
             <Label className="text-secondary-foreground">Public Session</Label>
             <Switch checked={form.isPublic} onCheckedChange={(v) => setForm({ ...form, isPublic: v })} />
           </div>
 
-          <div className="flex items-center justify-between py-2">
+          <div className="flex items-center justify-between py-1">
             <Label className="text-secondary-foreground">Monetized</Label>
             <Switch checked={form.isMonetized} onCheckedChange={(v) => setForm({ ...form, isMonetized: v })} />
           </div>

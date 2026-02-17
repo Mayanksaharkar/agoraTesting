@@ -61,6 +61,7 @@ export default function AstrologerLiveCourse() {
     leave,
     getClient,
     getLocalTracks,
+    startLiveStreaming,
   } = useAgora();
 
   const client = getClient();
@@ -94,11 +95,13 @@ export default function AstrologerLiveCourse() {
 
         let agoraConfig = state?.agora;
         let courseInfo = state?.courseInfo;
+        let youtubeConfig = (state as any)?.youtube;
 
         if (!agoraConfig) {
           const response = await astrologerApi.getCourseLiveToken(courseId);
           agoraConfig = response.data?.agora;
           courseInfo = response.data?.courseInfo;
+          youtubeConfig = response.data?.youtube;
         }
 
         if (!agoraConfig?.appId) {
@@ -111,6 +114,15 @@ export default function AstrologerLiveCourse() {
 
         const videoConfig = toVideoConfig(agoraConfig);
         await joinAsHost(videoConfig, 'course-local-video');
+
+        // If YouTube is configured AND enabled, start pushing to CDN
+        if (youtubeConfig?.rtmpUrl && youtubeConfig?.streamKey && youtubeConfig?.enabled) {
+          const combinedUrl = `${youtubeConfig.rtmpUrl}/${youtubeConfig.streamKey}`;
+          startLiveStreaming(combinedUrl).catch(err => {
+            console.error('Failed to start YouTube push for course:', err);
+            toast({ title: "Recording Issue", description: "Course is live but YouTube recording failed to start.", variant: "destructive" });
+          });
+        }
 
         // Store videoConfig for screen share
         (window as any).__videoConfig = videoConfig;

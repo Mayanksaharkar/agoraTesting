@@ -43,6 +43,7 @@ export default function UserLiveCourse() {
   const { user } = useAuth();
 
   const [courseInfo, setCourseInfo] = useState<LocationState['courseInfo']>();
+  const [youtubeConfig, setYoutubeConfig] = useState<any>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isConnecting, setIsConnecting] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -76,12 +77,14 @@ export default function UserLiveCourse() {
 
         let agoraConfig = state?.agora;
         let info = state?.courseInfo;
+        let yt = (state as any)?.youtube;
         const courseSource = state?.courseSource || 'astrologer';
 
         if (!agoraConfig) {
           const response = await userApi.getCourseJoinInfo(courseId, courseSource);
           agoraConfig = response.data?.agora;
           info = response.data?.courseInfo;
+          yt = response.data?.youtube;
         }
 
         if (!agoraConfig?.appId) {
@@ -90,6 +93,10 @@ export default function UserLiveCourse() {
 
         if (info) {
           setCourseInfo(info);
+        }
+
+        if (yt) {
+          setYoutubeConfig(yt);
         }
 
         const videoConfig = toVideoConfig(agoraConfig);
@@ -237,7 +244,20 @@ export default function UserLiveCourse() {
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 flex flex-col">
           <div className="flex-1 relative bg-secondary/20 flex items-center justify-center">
-            <div ref={remoteVideoRef} className="w-full h-full" />
+            {youtubeConfig?.broadcastId ? (
+              <div className="w-full h-full">
+                <iframe
+                  src={`https://www.youtube.com/embed/${youtubeConfig.broadcastId}?autoplay=1&mute=0&rel=0`}
+                  title="YouTube Live Stream"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full aspect-video"
+                />
+              </div>
+            ) : (
+              <div ref={remoteVideoRef} className="w-full h-full" />
+            )}
 
             {/* Camera Overlay for Student */}
             {remoteUsers.length > 1 && (
@@ -253,6 +273,13 @@ export default function UserLiveCourse() {
                   <Loader2 className="w-10 h-10 text-primary animate-spin mx-auto mb-3" />
                   <p className="text-foreground font-display">Connecting to live course...</p>
                 </div>
+              </div>
+            )}
+
+            {/* Show recording available message for ended YouTube course sessions */}
+            {courseInfo?.status === 'ended' && youtubeConfig?.broadcastId && (
+              <div className="absolute top-4 left-4 right-4 bg-emerald-600/90 text-white px-4 py-2 rounded-lg shadow-lg z-20">
+                <p className="text-sm font-medium">📹 This course session has ended. You're watching the recording.</p>
               </div>
             )}
 

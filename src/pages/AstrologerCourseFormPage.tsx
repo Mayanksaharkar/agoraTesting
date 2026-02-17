@@ -27,6 +27,7 @@ type FormState = {
   liveTimezone: string;
   recordingEnabled: boolean;
   recordingAvailabilityDays: string;
+  youtubeEnabled: boolean;
   modules: any[];
   resources: any[];
 };
@@ -50,6 +51,7 @@ const DEFAULT_FORM: FormState = {
   liveTimezone: "Asia/Kolkata",
   recordingEnabled: false,
   recordingAvailabilityDays: "",
+  youtubeEnabled: false,
   modules: [],
   resources: [],
 };
@@ -135,6 +137,7 @@ export default function AstrologerCourseFormPage() {
           recordingAvailabilityDays: course.recording?.availabilityDays
             ? String(course.recording.availabilityDays)
             : "",
+          youtubeEnabled: Boolean(course.agora?.youtubeEnabled),
           modules: (course.modules || []).map((m: any) => ({
             title: m.title || "",
             description: m.description || "",
@@ -247,6 +250,13 @@ export default function AstrologerCourseFormPage() {
           availabilityDays: form.recordingAvailabilityDays
             ? Number(form.recordingAvailabilityDays)
             : undefined,
+        };
+      }
+
+      if (form.courseType !== 'recorded') {
+        payload.agora = {
+          ...payload.agora,
+          youtubeEnabled: form.youtubeEnabled
         };
       }
 
@@ -487,6 +497,22 @@ export default function AstrologerCourseFormPage() {
                     />
                   </div>
                 </div>
+
+                {form.courseType !== 'recorded' && (
+                  <div className="flex items-center gap-3 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Youtube className="w-4 h-4 text-red-600" />
+                        <span className="font-semibold text-sm">Auto-Save to YouTube</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Automatically records and archives your live sessions to YouTube for permanent access.</p>
+                    </div>
+                    <Switch
+                      checked={form.youtubeEnabled}
+                      onCheckedChange={(checked) => updateField("youtubeEnabled", checked)}
+                    />
+                  </div>
+                )}
 
                 {/* Modules Section */}
                 <div className="space-y-4 pt-4 border-t border-amber-100">
