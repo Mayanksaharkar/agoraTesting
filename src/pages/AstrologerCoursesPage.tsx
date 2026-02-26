@@ -100,11 +100,11 @@ export default function AstrologerCoursesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-amber-50 to-emerald-50">
-      <header className="border-b border-amber-100 bg-white/90 backdrop-blur">
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border glass">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div>
-            <h1 className="font-semibold text-gray-900">My Courses</h1>
+            <h1 className="font-semibold text-foreground">My Courses</h1>
             <p className="text-xs text-muted-foreground">Manage your live and recorded courses</p>
           </div>
           <div className="flex items-center gap-2">
@@ -136,10 +136,10 @@ export default function AstrologerCoursesPage() {
               const isLiveCourse = course.courseType === 'live' || course.courseType === 'webinar';
 
               return (
-                <Card key={course._id} className="border-emerald-100 bg-white/90">
+                <Card key={course._id} className="border-border bg-card">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900 line-clamp-1">{course.title}</h3>
+                      <h3 className="font-semibold text-foreground line-clamp-1">{course.title}</h3>
                       <Badge variant="outline">{course.courseType || 'recorded'}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2">{course.description}</p>
@@ -158,7 +158,7 @@ export default function AstrologerCoursesPage() {
                         {course.liveSchedule.daysOfWeek && course.liveSchedule.daysOfWeek.length > 0 && course.liveSchedule.frequency === 'weekly' && (
                           <div className="flex flex-wrap gap-1">
                             {course.liveSchedule.daysOfWeek.map(d => (
-                              <Badge key={d} variant="secondary" className="text-[8px] h-3.5 px-1 bg-amber-50 text-amber-700 border-amber-100">
+                              <Badge key={d} variant="secondary" className="text-[8px] h-3.5 px-1">
                                 {d.substring(0, 3)}
                               </Badge>
                             ))}
@@ -175,7 +175,7 @@ export default function AstrologerCoursesPage() {
                         <Button
                           onClick={() => handleGoLive(course)}
                           disabled={!canGoLive(course)}
-                          className="bg-emerald-600 hover:bg-emerald-700 gap-2 flex-1 sm:flex-none"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2 flex-1 sm:flex-none"
                         >
                           <Radio className="w-4 h-4" />
                           {canGoLive(course) ? 'Go Live' : 'Not Live Yet'}
@@ -184,7 +184,7 @@ export default function AstrologerCoursesPage() {
                         <Button
                           variant="secondary"
                           onClick={() => navigate(`/astrologer/course-preview/${course._id}`, { state: { course } })}
-                          className="bg-amber-100 text-amber-700 hover:bg-amber-200 gap-2 flex-1 sm:flex-none"
+                          className="gap-2 flex-1 sm:flex-none"
                         >
                           <Play className="w-4 h-4" /> View Content
                         </Button>

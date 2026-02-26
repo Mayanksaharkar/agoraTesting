@@ -99,10 +99,10 @@ export default function UserDashboard() {
             <Button variant="outline" onClick={() => navigate('/user/my-courses')}>
               My Courses
             </Button>
-            <Button variant="outline" onClick={() => navigate('/user/remedies')} className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
+            <Button variant="outline" onClick={() => navigate('/user/remedies')} className="bg-secondary border-border text-foreground hover:bg-secondary">
               🔮 Remedies
             </Button>
-            <Button variant="outline" onClick={() => navigate('/user/bookings')} className="text-blue-600 border-blue-200 hover:bg-blue-50">
+            <Button variant="outline" onClick={() => navigate('/user/bookings')} className="text-foreground border-border hover:bg-secondary">
               📋 My Bookings
             </Button>
             <Button variant="outline" onClick={() => navigate('/user/astrologers')}>
@@ -157,52 +157,52 @@ export default function UserDashboard() {
         ) : (
           <>
             {/* Remedy Flow Demo Section */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+            <div className="mb-8 p-6 rounded-xl border border-border bg-secondary">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-semibold text-green-800 mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
                     🔮 Try Our New Remedy Booking Flow!
                   </h3>
-                  <p className="text-green-700">
+                  <p className="text-muted-foreground">
                     Book personalized remedy services with expert astrologers
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button 
-                    onClick={() => navigate('/user/remedies')} 
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                  <Button
+                    onClick={() => navigate('/user/remedies')}
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     Browse Remedies
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => navigate('/user/bookings')}
-                    className="border-green-300 text-green-700 hover:bg-green-100"
+                    className="border-border text-foreground hover:bg-secondary"
                   >
                     My Bookings
                   </Button>
                 </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div className="text-center p-3 bg-white rounded-lg border">
+                <div className="text-center p-3 bg-card rounded-lg border">
                   <div className="text-2xl mb-1">🕉️</div>
                   <div className="font-medium">VIP E-Pooja</div>
-                  <div className="text-green-600">Starting ₹1199</div>
+                  <div className="text-muted-foreground">Starting ₹1199</div>
                 </div>
-                <div className="text-center p-3 bg-white rounded-lg border">
+                <div className="text-center p-3 bg-card rounded-lg border">
                   <div className="text-2xl mb-1">✋</div>
                   <div className="font-medium">Palmistry</div>
-                  <div className="text-green-600">Starting ₹699</div>
+                  <div className="text-muted-foreground">Starting ₹699</div>
                 </div>
-                <div className="text-center p-3 bg-white rounded-lg border">
+                <div className="text-center p-3 bg-card rounded-lg border">
                   <div className="text-2xl mb-1">💼</div>
                   <div className="font-medium">Career</div>
-                  <div className="text-green-600">Starting ₹599</div>
+                  <div className="text-muted-foreground">Starting ₹599</div>
                 </div>
-                <div className="text-center p-3 bg-white rounded-lg border">
+                <div className="text-center p-3 bg-card rounded-lg border">
                   <div className="text-2xl mb-1">📝</div>
                   <div className="font-medium">Name Correction</div>
-                  <div className="text-green-600">Starting ₹799</div>
+                  <div className="text-muted-foreground">Starting ₹799</div>
                 </div>
               </div>
             </div>

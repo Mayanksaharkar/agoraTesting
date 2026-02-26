@@ -45,15 +45,15 @@ export default function UserCoursesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-white to-emerald-50">
-      <header className="sticky top-0 z-40 border-b border-amber-100 bg-white/90 backdrop-blur">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-40 border-b border-border glass">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="font-semibold text-gray-900">Learning Hub</h1>
+              <h1 className="font-semibold text-foreground">Learning Hub</h1>
               <p className="text-xs text-muted-foreground">Live courses and webinars</p>
             </div>
           </div>
@@ -71,10 +71,10 @@ export default function UserCoursesPage() {
               placeholder="Search courses or webinars"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-white border-amber-100"
+              className="pl-9 bg-secondary border-border"
             />
           </div>
-          <Button onClick={loadCourses} className="bg-amber-500 hover:bg-amber-600">
+          <Button onClick={loadCourses} className="bg-primary hover:bg-primary/90 text-primary-foreground">
             Refresh
           </Button>
         </div>
@@ -89,8 +89,8 @@ export default function UserCoursesPage() {
           <>
             <section className="mb-8">
               <div className="flex items-center gap-2 mb-4">
-                <Layers className="w-4 h-4 text-emerald-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Platform Courses</h2>
+                <Layers className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-lg font-semibold text-foreground">Platform Courses</h2>
               </div>
               {filteredAdmin.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No platform courses available yet.</p>
@@ -109,8 +109,8 @@ export default function UserCoursesPage() {
 
             <section>
               <div className="flex items-center gap-2 mb-4">
-                <Layers className="w-4 h-4 text-amber-600" />
-                <h2 className="text-lg font-semibold text-gray-900">Astrologer Courses</h2>
+                <Layers className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-lg font-semibold text-foreground">Astrologer Courses</h2>
               </div>
               {filteredAstrologer.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No astrologer courses available yet.</p>

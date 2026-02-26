@@ -450,20 +450,7 @@ const RemedyBookingPage = () => {
                         </CardContent>
                       </Card>
                       
-                      <Card 
-                        className={`cursor-pointer transition-colors ${paymentMethod === 'razorpay' ? 'ring-2 ring-green-500 bg-green-50' : ''}`}
-                        onClick={() => setPaymentMethod('razorpay')}
-                      >
-                        <CardContent className="p-4 flex items-center gap-3">
-                          <div className={`w-4 h-4 rounded-full border-2 ${paymentMethod === 'razorpay' ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
-                            {paymentMethod === 'razorpay' && <CheckCircle className="w-4 h-4 text-white" />}
-                          </div>
-                          <div>
-                            <div className="font-medium">Online Payment</div>
-                            <div className="text-sm text-gray-600">UPI, Card, Net Banking</div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                     
                     </div>
                   </div>
 

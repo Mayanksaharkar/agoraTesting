@@ -127,7 +127,7 @@ export default function AstrologerDashboard() {
             </div>
             <div>
               <h1 className="font-display font-bold text-foreground">Dashboard</h1>
-              <p className="text-xs text-muted-foreground">{user?.name || 'Astrologer'}</p>
+              <p className="text-xs text-muted-foreground">{ 'Astrologer'}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">

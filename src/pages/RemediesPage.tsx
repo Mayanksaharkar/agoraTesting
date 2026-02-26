@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/use-toast';
 const RemediesPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [remedies, setRemedies] = useState<Remedy[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -63,7 +63,7 @@ const RemediesPage = () => {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">🔮 Remedies</h1>
-        
+
         {/* Search */}
         <div className="relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -78,13 +78,13 @@ const RemediesPage = () => {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
-        
+
         {/* Personalized Remedy of the Day - Featured */}
         {remedies.length > 0 && (
           <div className="mb-10">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Personalized Remedy of the Day</h2>
-            <RemedyCardLarge 
-              remedy={remedies[0]} 
+            <RemedyCardLarge
+              remedy={remedies[0]}
               onClick={() => handleRemedyClick(remedies[0]._id)}
             />
           </div>
@@ -108,9 +108,9 @@ const RemediesPage = () => {
               {/* Grid - 2 columns on mobile, 3-4 on larger screens */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {remedyList.slice(0, 4).map((remedy) => (
-                  <RemedyCardSmall 
-                    key={remedy._id} 
-                    remedy={remedy} 
+                  <RemedyCardSmall
+                    key={remedy._id}
+                    remedy={remedy}
                     onClick={() => handleRemedyClick(remedy._id)}
                   />
                 ))}
@@ -125,22 +125,6 @@ const RemediesPage = () => {
           </div>
         )}
       </div>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="max-w-4xl mx-auto flex items-center justify-around">
-          <NavItem icon={Home} label="Home" onClick={() => navigate('/')} />
-          <NavItem icon={ShoppingBag} label="Store" onClick={() => navigate('/store')} />
-          <NavItem icon={BookOpen} label="Learn" onClick={() => navigate('/learn')} />
-          <NavItem icon={Phone} label="Call" onClick={() => navigate('/call')} />
-          <NavItem 
-            icon={Wind} 
-            label="Remedies" 
-            onClick={() => {}} 
-            active 
-          />
-        </div>
-      </div>
     </div>
   );
 };
@@ -148,7 +132,7 @@ const RemediesPage = () => {
 // Helper function to group remedies by category
 function groupByCategory(remedies: Remedy[]): Record<string, Remedy[]> {
   const groups: Record<string, Remedy[]> = {};
-  
+
   remedies.forEach(remedy => {
     if (!groups[remedy.category]) {
       groups[remedy.category] = [];
@@ -159,13 +143,13 @@ function groupByCategory(remedies: Remedy[]): Record<string, Remedy[]> {
   // Sort by predefined order
   const categoryOrder = ['VIP E-Pooja', 'Palmistry', 'Career', 'Name Correction', 'Face Reading', 'Problem Solving', 'Remedy Combos'];
   const sortedGroups: Record<string, Remedy[]> = {};
-  
+
   categoryOrder.forEach(cat => {
     if (groups[cat]) {
       sortedGroups[cat] = groups[cat];
     }
   });
-  
+
   // Add remaining categories
   Object.keys(groups).forEach(cat => {
     if (!categoryOrder.includes(cat)) {
@@ -187,35 +171,35 @@ function getCategoryDisplayName(category: string): string {
     'Problem Solving': '🧩 Problem Solving',
     'Remedy Combos': '🎁 Remedy Combos'
   };
-  
+
   return categoryNames[category] || category;
 }
 
 // Large Featured Remedy Card
-const RemedyCardLarge = ({ 
-  remedy, 
-  onClick 
-}: { 
-  remedy: Remedy; 
+const RemedyCardLarge = ({
+  remedy,
+  onClick
+}: {
+  remedy: Remedy;
   onClick: () => void;
 }) => {
   const startPrice = remedy.base_price || 0;
-  
+
   return (
-    <div 
+    <div
       className="relative cursor-pointer rounded-2xl overflow-hidden h-64 group"
       onClick={onClick}
     >
       {/* Background Image */}
-      <img 
-        src={remedy.image || '/placeholder-remedy.jpg'} 
+      <img
+        src={remedy.image || '/placeholder-remedy.jpg'}
         alt={remedy.title}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         onError={(e) => {
           e.currentTarget.src = 'https://via.placeholder.com/600x300?text=' + encodeURIComponent(remedy.title);
         }}
       />
-      
+
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
 
@@ -243,30 +227,30 @@ const RemedyCardLarge = ({
 };
 
 // Small Remedy Card
-const RemedyCardSmall = ({ 
-  remedy, 
-  onClick 
-}: { 
-  remedy: Remedy; 
+const RemedyCardSmall = ({
+  remedy,
+  onClick
+}: {
+  remedy: Remedy;
   onClick: () => void;
 }) => {
   const startPrice = remedy.base_price || 0;
-  
+
   return (
-    <div 
+    <div
       className="relative cursor-pointer rounded-lg overflow-hidden h-40 group"
       onClick={onClick}
     >
       {/* Background Image */}
-      <img 
-        src={remedy.image || '/placeholder-remedy.jpg'} 
+      <img
+        src={remedy.image || '/placeholder-remedy.jpg'}
         alt={remedy.title}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         onError={(e) => {
           e.currentTarget.src = 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(remedy.title);
         }}
       />
-      
+
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
@@ -287,31 +271,5 @@ const RemedyCardSmall = ({
   );
 };
 
-// Navigation Item
-const NavItem = ({ 
-  icon: Icon, 
-  label, 
-  onClick, 
-  active = false 
-}: { 
-  icon: React.ElementType;
-  label: string;
-  onClick: () => void;
-  active?: boolean;
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex flex-col items-center justify-center py-4 px-4 transition-colors ${
-        active 
-          ? 'text-green-600 border-t-2 border-green-600' 
-          : 'text-gray-600 hover:text-gray-900'
-      }`}
-    >
-      <Icon className="w-6 h-6 mb-1" />
-      <span className="text-xs font-medium">{label}</span>
-    </button>
-  );
-};
 
 export default RemediesPage;
