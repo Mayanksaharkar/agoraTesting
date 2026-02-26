@@ -98,7 +98,21 @@ export default function AstrologerEarnings() {
     setIsLoading(true);
     try {
       const response = await astrologerApi.getEarnings(selectedPeriod);
-      setEarningsData(response.data);
+      const data = (response && typeof response === 'object' && 'data' in response)
+        ? (response as any).data
+        : response;
+      const summary = data?.summary || {
+        totalEarnings: 0,
+        grossEarnings: 0,
+        netEarnings: 0,
+        totalCalls: 0,
+        averageDuration: 0,
+        averageRating: 0,
+        acceptanceRate: 0,
+      };
+      const breakdown = Array.isArray(data?.breakdown) ? data.breakdown : [];
+      const period = data?.period || selectedPeriod;
+      setEarningsData({ summary, breakdown, period });
     } catch (error: any) {
       toast({
         title: 'Failed to fetch earnings',
@@ -113,7 +127,13 @@ export default function AstrologerEarnings() {
   const fetchWalletData = async () => {
     try {
       const response = await astrologerApi.getWalletSummary();
-      setWalletData(response);
+      const data = (response && typeof response === 'object' && 'data' in response)
+        ? (response as any).data
+        : response;
+      const balance = typeof data?.balance === 'number' ? data.balance : 0;
+      const transactions = Array.isArray(data?.transactions) ? data.transactions : [];
+      const withdrawals = Array.isArray(data?.withdrawals) ? data.withdrawals : [];
+      setWalletData({ balance, transactions, withdrawals });
     } catch (error: any) {
       toast({
         title: 'Failed to fetch wallet data',
