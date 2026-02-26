@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Search, LogOut, Sparkles, Star, Filter, Notebook } from 'lucide-react';
+import { Eye, Search, Sparkles, Star, Filter } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { userApi } from '@/services/api';
 import { getSocket } from '@/services/socket';
-import { TOPICS, TOPIC_COLORS } from '@/config';
+import { TOPICS } from '@/config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import SessionCard from '@/components/SessionCard';
-import ChatNavLink from '@/components/ChatNavLink';
+import UserSidebar from '@/components/UserSidebar';
 
 interface LiveSession {
   _id: string;
@@ -78,48 +78,25 @@ export default function UserDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border glass sticky top-0 z-40">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="font-display font-bold text-foreground">Live Sessions</h1>
-              <p className="text-xs text-muted-foreground">Welcome, {user?.name || 'Explorer'}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <ChatNavLink />
-            <Button variant="outline" onClick={() => navigate('/user/courses')}>
-              Courses
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/user/my-courses')}>
-              My Courses
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/user/blogs')}>
-              <Notebook className="w-4 h-4 mr-2" />
-              Blogs
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/user/remedies')} className="bg-secondary border-border text-foreground hover:bg-secondary">
-              🔮 Remedies
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/user/bookings')} className="text-foreground border-border hover:bg-secondary">
-              📋 My Bookings
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/user/astrologers')}>
-              Find Astrologers
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/'); }} className="text-muted-foreground">
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar */}
+      <UserSidebar />
 
-      <main className="container mx-auto px-4 py-6">
+      {/* Main Content */}
+      <div className="flex-1">
+        {/* Header */}
+        <header className="border-b border-border glass sticky top-0 z-40">
+          <div className="px-6 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className="font-display font-bold text-foreground">Live Sessions</h1>
+                <p className="text-xs text-muted-foreground">Discover live astrology sessions</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="px-6 py-6">
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1 max-w-sm">
@@ -223,7 +200,8 @@ export default function UserDashboard() {
             </div>
           </>
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IndianRupee, Phone, Clock, Star, ChevronLeft, TrendingUp, Wallet, ArrowUpRight } from 'lucide-react';
+import { IndianRupee, Phone, Clock, Star, TrendingUp, Wallet, ArrowUpRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { astrologerApi } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AstrologerLayout from '@/components/AstrologerLayout';
 
 interface EarningsSummary {
   totalEarnings: number;
@@ -221,31 +222,23 @@ export default function AstrologerEarnings() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <AstrologerLayout>
       {/* Header */}
       <header className="border-b border-border glass sticky top-0 z-40">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/astrologer/dashboard')}
-              className="text-muted-foreground"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
             <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-primary-foreground" />
             </div>
             <div>
               <h1 className="font-display font-bold text-foreground">Earnings Dashboard</h1>
-              <p className="text-xs text-muted-foreground">{user?.name || 'Astrologer'}</p>
+              <p className="text-xs text-muted-foreground">Track your income and performance</p>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 space-y-6">
+      <main className="px-6 py-6 space-y-6">
         {/* Period Selector */}
         <div className="flex gap-2 overflow-x-auto pb-2">
           {(['all', 'daily', 'weekly', 'monthly'] as const).map((period) => (
@@ -609,6 +602,6 @@ export default function AstrologerEarnings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </AstrologerLayout>
   );
 }

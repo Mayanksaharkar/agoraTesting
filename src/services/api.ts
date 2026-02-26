@@ -113,6 +113,11 @@ export const astrologerApi = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<any>('/api/v1/astrologer/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }),
 
   // Package management
   getPackages: () =>
@@ -292,6 +297,11 @@ export const userApi = {
     request<any>(`/api/v1/user/courses/enrollments/${enrollmentId}/progress`, {
       method: 'PUT',
       body: JSON.stringify({ moduleId, completed })
+    }),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<any>('/api/v1/user/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newPassword }),
     }),
   getBlogs: (params?: { search?: string; page?: number; limit?: number }) =>
     request<any>(`/api/v1/user/blogs?${new URLSearchParams(params as any).toString()}`),

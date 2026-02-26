@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3, LogOut, Phone, Package, Sparkles, Layers, Notebook } from 'lucide-react';
+import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { astrologerApi } from '@/services/api';
@@ -13,7 +13,7 @@ import IncomingCallNotification from '@/components/IncomingCallNotification';
 import AvailabilityToggle from '@/components/AvailabilityToggle';
 import { useIncomingCalls } from '@/hooks/useIncomingCalls';
 import { useAvailability } from '@/hooks/useAvailability';
-import ChatNavLink from '@/components/ChatNavLink';
+import AstrologerSidebar from '@/components/AstrologerSidebar';
 
 interface Session {
   _id: string;
@@ -117,92 +117,36 @@ export default function AstrologerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border glass sticky top-0 z-40">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg gold-gradient flex items-center justify-center">
-              <BarChart3 className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="font-display font-bold text-foreground">Dashboard</h1>
-              <p className="text-xs text-muted-foreground">{ 'Astrologer'}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Availability Toggle */}
-            <AvailabilityToggle
-              initialStatus={availabilityStatus}
-              onStatusChange={updateAvailabilityStatus}
-            />
-            <ChatNavLink />
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/astrologer/earnings')} 
-              className="gap-2"
-            >
-              <BarChart3 className="w-4 h-4" />
-              Earnings
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/astrologer/blogs')} 
-              className="gap-2"
-            >
-              <Notebook className="w-4 h-4" />
-              Blogs
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/astrologer/calls/history')} 
-              className="gap-2"
-            >
-              <Phone className="w-4 h-4" />
-              Call History
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/astrologer/packages')} 
-              className="gap-2"
-            >
-              <Package className="w-4 h-4" />
-              Packages
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/astrologer/courses')}
-              className="gap-2"
-            >
-              <Layers className="w-4 h-4" />
-              Courses
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/astrologer/remedies')}
-              className="gap-2"
-            >
-              <Sparkles className="w-4 h-4" />
-              Remedies
-            </Button>
-            <Button onClick={() => setShowCreateModal(true)} className="gold-gradient text-primary-foreground gap-2">
-              <Plus className="w-4 h-4" />
-              New Session
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => { logout(); navigate('/'); }} className="text-muted-foreground">
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar */}
+      <AstrologerSidebar />
 
-      <main className="container mx-auto px-4 py-6 space-y-6">
+      {/* Main Content */}
+      <div className="flex-1">
+        {/* Header */}
+        <header className="border-b border-border glass sticky top-0 z-40">
+          <div className="px-6 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className="font-display font-bold text-foreground">Dashboard</h1>
+                <p className="text-xs text-muted-foreground">Manage your sessions and activities</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              {/* Availability Toggle */}
+              <AvailabilityToggle
+                initialStatus={availabilityStatus}
+                onStatusChange={updateAvailabilityStatus}
+              />
+              <Button onClick={() => setShowCreateModal(true)} className="gold-gradient text-primary-foreground gap-2">
+                <Plus className="w-4 h-4" />
+                New Session
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        <main className="px-6 py-6 space-y-6">
         {/* Stats Overview */}
         {overallStats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -290,24 +234,25 @@ export default function AstrologerDashboard() {
             )}
           </TabsContent>
         </Tabs>
-      </main>
+        </main>
 
-      {showCreateModal && (
-        <CreateSessionModal onClose={() => setShowCreateModal(false)} onCreated={handleSessionCreated} />
-      )}
+        {showCreateModal && (
+          <CreateSessionModal onClose={() => setShowCreateModal(false)} onCreated={handleSessionCreated} />
+        )}
 
-      {/* Incoming Call Notification */}
-      {incomingCall && (
-        <IncomingCallNotification
-          callId={incomingCall.callId}
-          userName={incomingCall.userName}
-          userPhoto={incomingCall.userPhoto}
-          callType={incomingCall.callType}
-          onAccept={handleAcceptCall}
-          onReject={handleRejectCall}
-          timeout={30}
-        />
-      )}
+        {/* Incoming Call Notification */}
+        {incomingCall && (
+          <IncomingCallNotification
+            callId={incomingCall.callId}
+            userName={incomingCall.userName}
+            userPhoto={incomingCall.userPhoto}
+            callType={incomingCall.callType}
+            onAccept={handleAcceptCall}
+            onReject={handleRejectCall}
+            timeout={30}
+          />
+        )}
+      </div>
     </div>
   );
 }
