@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3, LogOut, Phone, Package, Sparkles, Layers } from 'lucide-react';
+import { Eye, Heart, MessageCircle, Clock, Plus, Play, X, BarChart3, LogOut, Phone, Package, Sparkles, Layers, Notebook } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { astrologerApi } from '@/services/api';
@@ -145,6 +145,15 @@ export default function AstrologerDashboard() {
             >
               <BarChart3 className="w-4 h-4" />
               Earnings
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/astrologer/blogs')} 
+              className="gap-2"
+            >
+              <Notebook className="w-4 h-4" />
+              Blogs
             </Button>
             <Button 
               variant="outline" 

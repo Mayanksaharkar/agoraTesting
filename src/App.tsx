@@ -18,6 +18,8 @@ const AstrologerProfile = lazy(() => import("./pages/AstrologerProfile"));
 const AstrologerList = lazy(() => import("./pages/AstrologerList"));
 const AstrologerCallHistory = lazy(() => import("./pages/AstrologerCallHistory"));
 const AstrologerEarnings = lazy(() => import("./pages/AstrologerEarnings"));
+const AstrologerBlogsPage = lazy(() => import("./pages/AstrologerBlogsPage"));
+const AstrologerBlogFormPage = lazy(() => import("./pages/AstrologerBlogFormPage"));
 const PackageManagement = lazy(() => import("./pages/PackageManagement"));
 const AstrologerRemediesPage = lazy(() => import("./pages/AstrologerRemediesPage"));
 const UserDashboard = lazy(() => import("./pages/UserDashboard"));
@@ -33,6 +35,8 @@ const UserMyCoursesPage = lazy(() => import("./pages/UserMyCoursesPage"));
 const AstrologerLiveCourse = lazy(() => import("./pages/AstrologerLiveCourse"));
 const UserLiveCourse = lazy(() => import("./pages/UserLiveCourse"));
 const UserRecordedCourse = lazy(() => import("./pages/UserRecordedCourse"));
+const UserBlogsPage = lazy(() => import("./pages/UserBlogsPage"));
+const UserBlogDetailsPage = lazy(() => import("./pages/UserBlogDetailsPage"));
 
 // Remedy Pages
 const RemediesPage = lazy(() => import("./pages/RemediesPage"));
@@ -86,6 +90,9 @@ function AppRoutes() {
       <Route path="/astrologer/calls/:callId/details" element={<ProtectedRoute requiredRole="astrologer"><CallDetails /></ProtectedRoute>} />
       <Route path="/astrologer/earnings" element={<ProtectedRoute requiredRole="astrologer"><AstrologerEarnings /></ProtectedRoute>} />
       <Route path="/astrologer/packages" element={<ProtectedRoute requiredRole="astrologer"><PackageManagement /></ProtectedRoute>} />
+      <Route path="/astrologer/blogs" element={<ProtectedRoute requiredRole="astrologer"><AstrologerBlogsPage /></ProtectedRoute>} />
+      <Route path="/astrologer/blogs/new" element={<ProtectedRoute requiredRole="astrologer"><AstrologerBlogFormPage /></ProtectedRoute>} />
+      <Route path="/astrologer/blogs/:blogId/edit" element={<ProtectedRoute requiredRole="astrologer"><AstrologerBlogFormPage /></ProtectedRoute>} />
       <Route path="/astrologer/remedies" element={<ProtectedRoute requiredRole="astrologer"><AstrologerRemediesPage /></ProtectedRoute>} />
       <Route path="/user" element={<ProtectedRoute requiredRole="user"><UserDashboard /></ProtectedRoute>} />
       <Route path="/user/astrologers" element={<ProtectedRoute requiredRole="user"><AstrologerList /></ProtectedRoute>} />
@@ -93,6 +100,8 @@ function AppRoutes() {
       <Route path="/user/courses/:type/:courseId" element={<ProtectedRoute requiredRole="user"><UserCourseDetail /></ProtectedRoute>} />
       <Route path="/user/live-course/:courseId" element={<ProtectedRoute requiredRole="user"><UserLiveCourse /></ProtectedRoute>} />
       <Route path="/user/recorded-course/:courseId" element={<ProtectedRoute requiredRole="user"><UserRecordedCourse /></ProtectedRoute>} />
+      <Route path="/user/blogs" element={<ProtectedRoute requiredRole="user"><UserBlogsPage /></ProtectedRoute>} />
+      <Route path="/user/blogs/:blogId" element={<ProtectedRoute requiredRole="user"><UserBlogDetailsPage /></ProtectedRoute>} />
       <Route path="/user/my-courses" element={<ProtectedRoute requiredRole="user"><UserMyCoursesPage /></ProtectedRoute>} />
       <Route path="/user/calls/history" element={<ProtectedRoute requiredRole="user"><UserCallHistory /></ProtectedRoute>} />
       <Route path="/user/calls/:callId/details" element={<ProtectedRoute requiredRole="user"><CallDetails /></ProtectedRoute>} />

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Search, LogOut, Sparkles, Star, Filter } from 'lucide-react';
+import { Eye, Search, LogOut, Sparkles, Star, Filter, Notebook } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { userApi } from '@/services/api';
 import { getSocket } from '@/services/socket';
@@ -98,6 +98,10 @@ export default function UserDashboard() {
             </Button>
             <Button variant="outline" onClick={() => navigate('/user/my-courses')}>
               My Courses
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/user/blogs')}>
+              <Notebook className="w-4 h-4 mr-2" />
+              Blogs
             </Button>
             <Button variant="outline" onClick={() => navigate('/user/remedies')} className="bg-secondary border-border text-foreground hover:bg-secondary">
               🔮 Remedies

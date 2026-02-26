@@ -170,6 +170,32 @@ export const astrologerApi = {
       body: formData,
     }).then(res => res.json());
   },
+  getMyBlogs: (page = 1, limit = 10) =>
+    request<any>(`/api/v1/astrologer/blogs?page=${page}&limit=${limit}`),
+  createBlog: (formData: FormData) => {
+    const token = localStorage.getItem('auth_token');
+    return fetch(`${BASE_URL}/api/v1/astrologer/blog`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    }).then(res => res.json());
+  },
+  updateBlog: (blogId: string, formData: FormData) => {
+    const token = localStorage.getItem('auth_token');
+    return fetch(`${BASE_URL}/api/v1/astrologer/blog/${blogId}`, {
+      method: 'PUT',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    }).then(res => res.json());
+  },
+  deleteBlog: (blogId: string) =>
+    request<any>(`/api/v1/astrologer/blog/${blogId}`, {
+      method: 'DELETE',
+    }),
 };
 
 // User
@@ -267,4 +293,8 @@ export const userApi = {
       method: 'PUT',
       body: JSON.stringify({ moduleId, completed })
     }),
+  getBlogs: (params?: { search?: string; page?: number; limit?: number }) =>
+    request<any>(`/api/v1/user/blogs?${new URLSearchParams(params as any).toString()}`),
+  getBlogById: (id: string) =>
+    request<any>(`/api/v1/user/blogs/${id}`),
 };
